@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCSVToES", "TinyCSVToES\TinyCSVToES.csproj", "{6077685C-8EC1-4D78-BC98-860E4E33BC37}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSVToESLib", "CSVToESLib\CSVToESLib.csproj", "{2A05A3E8-612D-4CDD-8F0D-6DD7CBCB3FA9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSVToESLib.Tests", "CSVToESLib.Tests\CSVToESLib.Tests.csproj", "{FC3E7F47-64CE-4293-89D5-D3BB7C4BD72B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{6077685C-8EC1-4D78-BC98-860E4E33BC37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6077685C-8EC1-4D78-BC98-860E4E33BC37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6077685C-8EC1-4D78-BC98-860E4E33BC37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A05A3E8-612D-4CDD-8F0D-6DD7CBCB3FA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A05A3E8-612D-4CDD-8F0D-6DD7CBCB3FA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A05A3E8-612D-4CDD-8F0D-6DD7CBCB3FA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A05A3E8-612D-4CDD-8F0D-6DD7CBCB3FA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC3E7F47-64CE-4293-89D5-D3BB7C4BD72B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC3E7F47-64CE-4293-89D5-D3BB7C4BD72B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC3E7F47-64CE-4293-89D5-D3BB7C4BD72B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC3E7F47-64CE-4293-89D5-D3BB7C4BD72B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
