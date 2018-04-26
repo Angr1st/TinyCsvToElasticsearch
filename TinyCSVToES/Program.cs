@@ -1,4 +1,6 @@
 ﻿using System;
+using CSVToESLib;
+using static System.Console;
 
 namespace TinyCSVToES
 {
@@ -6,7 +8,9 @@ namespace TinyCSVToES
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            CSVToESLib.Class1 class1 = new Class1();
+            WriteLine("This is a test message.");
+            ReadLine();
         }
     }
 }
