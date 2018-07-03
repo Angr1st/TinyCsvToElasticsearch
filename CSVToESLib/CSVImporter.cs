@@ -18,16 +18,20 @@ namespace CSVToESLib
             return result.Success;
         }
 
-        public Type CreateIL()
+        public Type CreateIL(string[] fields)
         {
             AssemblyName assemblyName = new AssemblyName(NameGenerator());
             var assembly = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
 
             var module = assembly.DefineDynamicModule("dynamicModule");
 
-            var personType = module.DefineType("Person", TypeAttributes.Public | TypeAttributes.AutoLayout | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, typeof(Object));
+            var personType = module.DefineType("Person", TypeAttributes.Public);
 
-            personType.DefineField("FieldOne", typeof(string), FieldAttributes.Public);
+            foreach (var item in fields)
+            {
+                personType.DefineField(item, typeof(string), FieldAttributes.Public);
+            }
+
 
             return personType.CreateType();
 
