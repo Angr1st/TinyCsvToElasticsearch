@@ -10,7 +10,8 @@ namespace TinyCSVToES
         {
             CSVToESLib.CSVImporter cSVImporter = new CSVImporter();
             var newType = cSVImporter.CreateIL();
-            Object helloWorld = Activator.CreateInstance(newType, new Object[] { "HelloWorld" });
+            Object helloWorld = Activator.CreateInstance(newType);
+            helloWorld
             WriteLine("This is a test message.");
             ReadLine();
         }
