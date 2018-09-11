@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using TinyCsvParser.Mapping;
 
 namespace CSVToESLib
 {
@@ -9,7 +10,7 @@ namespace CSVToESLib
     {
         Elasticsearch.Net.ElasticLowLevelClient ElasticLowLevelClient = new Elasticsearch.Net.ElasticLowLevelClient();
 
-        public async Task<StringResponse> BulkInsert(ParallelQuery<TinyCsvParser.Mapping.CsvMappingResult<Person>> results)
+        public async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<Person>> results)
         {
             return await ElasticLowLevelClient.BulkAsync<StringResponse>(PostData.MultiJson(results.Where(result => result.IsValid).Select(result => new Object[] { new Index(result.Result, "1") }).Aggregate((newValue, oldValue) => oldValue.Concat(newValue).ToArray())));
         }
