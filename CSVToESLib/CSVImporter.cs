@@ -25,10 +25,17 @@ namespace CSVToESLib
 
             var module = assembly.DefineDynamicModule("dynamicModule");
 
-            TypeBuilder personType = CreatePersonType(fields, module);
-            var person = personType.CreateType();
-            //personType.
-            ////module.DefineType("CsvMappingPerson", TypeAttributes.AutoLayout | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, typeof(TinyCsvParser.Mapping.CsvMapping<person>));
+            Type personType = CreatePersonType(fields, module);
+            Type csvMappingBase = typeof(TinyCsvParser.Mapping.CsvMapping<>);
+            TypeBuilder csvMappingBuilder = module.DefineType("TempTypeForGenerics");
+            string[] typeParamNames = { "TFirst" };
+            GenericTypeParameterBuilder[] typeParams = csvMappingBuilder.DefineGenericParameters(typeParamNames);
+            GenericTypeParameterBuilder TFirst = typeParams[0];
+            TFirst.SetBaseTypeConstraint(personType);
+            Type specificGenericCsvMapping = csvMappingBase.MakeGenericType(TFirst);
+
+            Type csvPersonMapping = module.DefineType("CsvMappingPerson", TypeAttributes.AutoLayout | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, specificGenericCsvMapping);
+
             ////return 
             return typeof(String);
 
@@ -316,7 +323,7 @@ namespace CSVToESLib
          */
 
 
-    private static TypeBuilder CreatePersonType(string[] fields, ModuleBuilder module)
+    private static Type CreatePersonType(string[] fields, ModuleBuilder module)
         {
             var personType = module.DefineType("Person", TypeAttributes.Public);
 
@@ -325,7 +332,7 @@ namespace CSVToESLib
                 personType.DefineField(item, typeof(string), FieldAttributes.Public);
             }
 
-            return personType;
+            return personType.CreateType();
         }
 
         public string NameGenerator() => new Guid().ToString();
