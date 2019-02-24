@@ -14,9 +14,6 @@ namespace CSVToESLib
         {
             return await ElasticLowLevelClient.BulkAsync<StringResponse>(PostData.MultiJson(results.Where(result => result.IsValid).Select(result => new Object[] { new Index(result.Result, "1") }).Aggregate((newValue, oldValue) => oldValue.Concat(newValue).ToArray())));
         }
-
-
-
     }
 
     class Index

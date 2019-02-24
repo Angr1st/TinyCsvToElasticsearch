@@ -1,8 +1,6 @@
-﻿using System;
+﻿using System.Linq;
 using TinyCsvParser;
 using TinyCsvParser.Mapping;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CSVToESLib
 {
