@@ -1,8 +1,10 @@
 ﻿using LamarCompiler;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+
 
 namespace CSVToESLib
 {
@@ -18,7 +20,7 @@ namespace CSVToESLib
             return result.Success;
         }
 
-    private static Type CreatePersonType(string[] fields)
+        private static ICsvImporter CreatePersonType(string[] fields)
         {
             var generator = new AssemblyGenerator();
 
@@ -26,34 +28,40 @@ namespace CSVToESLib
 
             var assembly = generator.Generate(x =>
             {
-                x.Namespace($"CsvToEs{AssemblyNumber}");
-                AssemblyNumber++;
-
+                var writer = new SourceWriter(x);
+                writer.Write((y) => y.Namespace($"CsvToEs{AssemblyNumber}"), false)
+                .Write
                 CreateClass(x, "CsvClient", null, CreateParse);
                 x.FinishBlock();
+                AssemblyNumber++;
             });
+
+            assembly.GetExportedTypes().Single();
+            assembly.CreateInstance()
         }
 
         private static void CreateParse(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write("BLOCK:public ParallelQuery<CsvMappingResult<Persion>> Parse(string filePath");
+            sourceWriter.Write("public ParallelQuery<CsvMappingResult<Persion>> Parse(string filePath");
             sourceWriter.Write("CsvParserOptions csvParserOptions = new CsvParserOptions(true, ';');");
             sourceWriter.Write("CSVPersonMapping csvMapper = new CSVPersonMapping();");
             sourceWriter.Write("CsvParser<Person> csvParser = new CsvParser<Person>(csvParserOptions, csvMapper);");
             sourceWriter.Write("return csvParser.ReadFromFile(filePath, System.Text.Encoding.UTF8);");
         }
 
-        private static void CreateBulkPriceImportPOCO(ISourceWriter sourceWriter)
-        { }
+        private static void CreateBulkPriceImportPOCO(ISourceWriter sourceWriter, string[] fields)
+        {
+
+        }
 
         private static ISourceWriter CreateClass(ISourceWriter sourceWriter, string className, Type type, Action<ISourceWriter> action)
         {
-           return CreateClass(sourceWriter, className, type, new List<Action<ISourceWriter>>() { action });
+            return CreateClass(sourceWriter, className, type, new List<Action<ISourceWriter>>() { action });
         }
 
         private static ISourceWriter CreateClass(ISourceWriter sourceWriter, string className, Type type, List<Action<ISourceWriter>> actions)
         {
-            if(type == null)
+            if (type == null)
             {
                 sourceWriter.StartClass(className);
             }
