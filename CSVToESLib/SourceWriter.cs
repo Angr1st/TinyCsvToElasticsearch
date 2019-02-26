@@ -12,34 +12,32 @@ namespace CSVToESLib
 
         internal SourceWriter(ISourceWriter sourceWriter) => Writer = sourceWriter;
 
-        internal SourceWriter Write<T>(Action<ISourceWriter,T> action, T parameter, bool IsBlock = true)
+        internal SourceWriter Write<T>(Action<ISourceWriter,T> action, T parameter, bool isFinishBlock = true, bool IsBlock = true)
         {
             if (IsBlock)
             {
                 Writer.Write(BLOCK);
             }
             action(Writer,parameter);
-            if (IsBlock)
+            if (isFinishBlock)
             {
                 Writer.FinishBlock();
             }
             return this;
         }
 
-        internal SourceWriter Write(Action<ISourceWriter> action, bool IsBlock = true)
+        internal SourceWriter Write(Action<ISourceWriter> action, bool isFinishBlock = true, bool IsBlock = true)
         {
             if (IsBlock)
             {
                 Writer.Write(BLOCK);
             }
             action(Writer);
-            if (IsBlock)
+            if (isFinishBlock)
             {
                 Writer.FinishBlock();
             }
             return this;
         }
-
-
     }
 }

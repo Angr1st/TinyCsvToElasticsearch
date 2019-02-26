@@ -37,7 +37,7 @@ namespace CSVToESLib
             });
 
             assembly.GetExportedTypes().Single();
-            assembly.CreateInstance()
+            assembly.CreateInstance();
         }
 
         private static void CreateParse(ISourceWriter sourceWriter)
@@ -50,6 +50,14 @@ namespace CSVToESLib
         }
 
         private static void CreateBulkPriceImportPOCO(ISourceWriter sourceWriter, string[] fields)
+        {
+            foreach (var item in fields)
+            {
+                sourceWriter.Write($"public string {item};)");
+            }
+        }
+
+        private static void CreatePocoMappingCtor(ISourceWriter sourceWriter, string[] fields)
         {
 
         }
