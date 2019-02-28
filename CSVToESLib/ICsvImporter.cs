@@ -7,6 +7,6 @@ namespace CSVToESLib
 {
     public interface ICsvImporter
     {
-        Task<bool> ImportCSV(string filePath);
+        Task<bool> ImportCSV(string filePath, int version);
     }
 }

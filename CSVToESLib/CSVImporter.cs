@@ -20,7 +20,7 @@ namespace CSVToESLib
             return result.Success;
         }
 
-        private static ICsvImporter CreatePersonType(string[] fields)
+        private static ICsvImporter CreatePersonType(string[] fields, int version)
         {
             var generator = new AssemblyGenerator();
 
