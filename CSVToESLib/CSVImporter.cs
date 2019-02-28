@@ -20,11 +20,11 @@ namespace CSVToESLib
             return result.Success;
         }
 
-        private static ICsvImporter CreatePersonType(string[] fields, int version)
+        private static ICsvImporter CreateBulkPriceImporterType(string[] fields, int version)
         {
             var generator = new AssemblyGenerator();
 
-            //generator.ReferenceAssembly(typeof().Assembly);
+            generator.ReferenceAssembly(typeof(ICsvImporter).Assembly);
 
             var assembly = generator.Generate(x =>
             {
@@ -49,12 +49,13 @@ namespace CSVToESLib
             sourceWriter.Write("return csvParser.ReadFromFile(filePath, System.Text.Encoding.UTF8);");
         }
 
-        private static void CreateBulkPriceImportPOCOFields(ISourceWriter sourceWriter, string[] fields)
+        private static void CreateBulkPriceImportPOCOFields(ISourceWriter sourceWriter, (string[] fields, int version) data)
         {
-            foreach (var item in fields)
+            foreach (var item in data.fields)
             {
                 sourceWriter.Write($"public string {item};)");
             }
+            sourceWriter.Write($"public string Version = {data.version};");
         }
 
         private static void CreatePocoMappingCtor(ISourceWriter sourceWriter, string[] fields)
