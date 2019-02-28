@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CSVToESLib
 {
-    public class CSVImporter
+    public class CsvImporterGenerator
     {
         private static int AssemblyNumber = 0;
         CSVClient CSVClient = new CSVClient();
@@ -29,7 +29,7 @@ namespace CSVToESLib
             var assembly = generator.Generate(x =>
             {
                 var writer = new SourceWriter(x);
-                writer.Write((y) => y.Namespace($"CsvToEs{AssemblyNumber}"), false)
+                writer.Write(CreateNamespace, AssemblyNumber, false, false)
                 .Write
                 CreateClass(x, "CsvClient", null, CreateParse);
                 x.FinishBlock();
@@ -38,6 +38,11 @@ namespace CSVToESLib
 
             assembly.GetExportedTypes().Single();
             assembly.CreateInstance();
+        }
+
+        private static void CreateNamespace(ISourceWriter sourceWriter, int assemblyNumber)
+        {
+            sourceWriter.Namespace($"CsvToEsLib{AssemblyNumber}");
         }
 
         private static void CreateParse(ISourceWriter sourceWriter)

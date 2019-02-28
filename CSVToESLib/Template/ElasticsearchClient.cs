@@ -1,14 +1,24 @@
 ﻿using Elasticsearch.Net;
 using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 using TinyCsvParser.Mapping;
 
 namespace CSVToESLib
 {
-    class ElasticsearchClient
+    internal class ElasticsearchClient
     {
-        Elasticsearch.Net.ElasticLowLevelClient ElasticLowLevelClient = new Elasticsearch.Net.ElasticLowLevelClient();
+        ElasticLowLevelClient ElasticLowLevelClient { get; set; }
+        public ElasticsearchClient(ConnectionConfiguration configuration)
+        {
+            ElasticLowLevelClient = new ElasticLowLevelClient(configuration);
+        }
+
 
         public async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<Person>> results)
         {
@@ -16,7 +26,7 @@ namespace CSVToESLib
         }
     }
 
-    class Index
+    internal class Index
     {
         public InnerIndex InnerIndexField;
         public Person Person;
@@ -28,7 +38,7 @@ namespace CSVToESLib
         }
     }
 
-    class InnerIndex
+    internal class InnerIndex
     {
         public string _index;
         public string _type;

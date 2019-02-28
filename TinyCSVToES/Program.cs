@@ -9,7 +9,7 @@ namespace TinyCSVToES
         static void Main(string[] args)
         {
             string[] nameArray = new string[] { "FirstFüeld", "SecondField" };
-            CSVToESLib.CSVImporter cSVImporter = new CSVImporter();
+            CSVToESLib.CsvImporterGenerator cSVImporter = new CsvImporterGenerator();
 
 
             ReadLine();
