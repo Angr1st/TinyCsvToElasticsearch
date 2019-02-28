@@ -42,14 +42,14 @@ namespace CSVToESLib
 
         private static void CreateParse(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write("public ParallelQuery<CsvMappingResult<Persion>> Parse(string filePath");
+            sourceWriter.Write($"public ParallelQuery<CsvMappingResult<{CsvImportClassNames.BulkPrice}>> Parse(string filePath");
             sourceWriter.Write("CsvParserOptions csvParserOptions = new CsvParserOptions(true, ';');");
-            sourceWriter.Write("CSVPersonMapping csvMapper = new CSVPersonMapping();");
-            sourceWriter.Write("CsvParser<Person> csvParser = new CsvParser<Person>(csvParserOptions, csvMapper);");
+            sourceWriter.Write($"{CsvImportClassNames.CsvBulkPriceMapping} csvMapper = new {CsvImportClassNames.CsvBulkPriceMapping}();");
+            sourceWriter.Write($"CsvParser<{CsvImportClassNames.BulkPrice}> csvParser = new CsvParser<{CsvImportClassNames.BulkPrice}>(csvParserOptions, csvMapper);");
             sourceWriter.Write("return csvParser.ReadFromFile(filePath, System.Text.Encoding.UTF8);");
         }
 
-        private static void CreateBulkPriceImportPOCO(ISourceWriter sourceWriter, string[] fields)
+        private static void CreateBulkPriceImportPOCOFields(ISourceWriter sourceWriter, string[] fields)
         {
             foreach (var item in fields)
             {
@@ -59,7 +59,11 @@ namespace CSVToESLib
 
         private static void CreatePocoMappingCtor(ISourceWriter sourceWriter, string[] fields)
         {
-
+            sourceWriter.Write($"public {CsvImportClassNames.CsvBulkPriceMapping}() : base()");
+            for (int i = 0; i < fields.Length-1; i++)
+            {
+                sourceWriter.Write($"MapProperty({i}, x => x.{fields[i]};");
+            }
         }
 
         private static ISourceWriter CreateClass(ISourceWriter sourceWriter, string className, Type type, Action<ISourceWriter> action)
