@@ -7,7 +7,6 @@ namespace CSVToESLib
 {
     internal class SourceWriter
     {
-        private const string BLOCK = "BLOCK:";
         private int IndentationLevel = 0;
         internal ISourceWriter Writer { get; private set; }
 
@@ -28,23 +27,34 @@ namespace CSVToESLib
 
         internal SourceWriter WriteClass<T>(Action<ISourceWriter, T> action, T parameter)
         {
-            Writer.Write(BLOCK);
             action(Writer, parameter);
+            IndentationLevel++;
 
             return this;
         }
 
         internal SourceWriter WriteClass(Action<ISourceWriter> action)
         {
-            Writer.Write(BLOCK);
             action(Writer);
+            IndentationLevel++;
 
+            return this;
+        }
+
+        internal SourceWriter WriteFields<T>(Action<ISourceWriter, T> action, T parameter)
+        {
+            action(Writer, parameter);
+            return this;
+        }
+
+        internal SourceWriter WriteFields(Action<ISourceWriter> action)
+        {
+            action(Writer);
             return this;
         }
 
         internal SourceWriter WriteMethod<T>(Action<ISourceWriter, T> action, T parameter)
         {
-            Writer.Write(BLOCK);
             action(Writer, parameter);
             Writer.FinishBlock();
 
@@ -53,25 +63,30 @@ namespace CSVToESLib
 
         internal SourceWriter WriteMethod(Action<ISourceWriter> action)
         {
-            Writer.Write(BLOCK);
             action(Writer);
             Writer.FinishBlock();
 
             return this;
         }
 
-        internal SourceWriter FinishBlock(bool complete)
+        internal SourceWriter FinishBlock(bool complete = false)
         {
+            if (IndentationLevel < 1)
+                return this;
+
+
             if (complete)
             {
-            for (int i = 0; i < IndentationLevel; i++)
-            {
-                Writer.FinishBlock();
-            }
+                for (int i = 0; i < IndentationLevel; i++)
+                {
+                    Writer.FinishBlock();
+                }
+                IndentationLevel = 0;
             }
             else
             {
                 Writer.FinishBlock();
+                IndentationLevel--;
             }
             return this;
         }

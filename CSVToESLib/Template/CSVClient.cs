@@ -2,7 +2,7 @@
 using TinyCsvParser;
 using TinyCsvParser.Mapping;
 
-namespace CSVToESLib
+namespace CSVToESLib.Template
 {
     class CSVClient
     {
