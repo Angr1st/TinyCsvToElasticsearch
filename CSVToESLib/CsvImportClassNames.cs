@@ -16,5 +16,6 @@ namespace CSVToESLib
         public static readonly string _index = nameof(_index);
         public static readonly string _type = nameof(_type);
         public static readonly string CsvImporter = nameof(CsvImporter);
+        public static readonly string ICsvImporter = nameof(ICsvImporter);
     }
 }

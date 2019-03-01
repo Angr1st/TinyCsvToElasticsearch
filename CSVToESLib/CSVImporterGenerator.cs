@@ -11,10 +11,9 @@ namespace CSVToESLib
     public static class CsvImporterGenerator
     {
         private static int AssemblyNumber = 0;
-        private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Elasticsearch.Net", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser" };
+        private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Elasticsearch.Net", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser", "CSVToESLib" };
 
-
-        private static ICsvImporter CreateBulkPriceImporterType(string[] fields, int version)
+        public static ICsvImporter CreateBulkPriceImporterType(string[] fields, int version)
         {
             var generator = new AssemblyGenerator();
 
@@ -55,19 +54,23 @@ namespace CSVToESLib
                 .WriteClass(y => y.Write(FirstLine(CsvImportClassNames.InnerIndex)))
                 .WriteFields(CreateInnerIndexFields)
                 .WriteMethod(CreateInnerIndexCtor)
+                .WriteClass(y => y.Write(FirstLine($"{CsvImportClassNames.CsvImporter} : {CsvImportClassNames.ICsvImporter}")))
+                .WriteFields(CreateCsvImporterFields)
+                .WriteMethod(CreateImportCsv)
                 .FinishBlock(true);
 
                 AssemblyNumber++;
             });
 
-            assembly.GetExportedTypes().Single();
-            return assembly.CreateInstance(CsvImportClassNames.CsvImporter) as ICsvImporter;
+            var types = assembly.GetExportedTypes();
+            var type = types.FirstOrDefault(z => z.Name == CsvImportClassNames.CsvImporter);
+            return type != null ? Activator.CreateInstance(type) as ICsvImporter : null;
         }
 
         private static string FirstLine(string content, bool isClass = true)
         {
             if (isClass)
-                content = "class " + content;
+                content = "public class " + content;
             else
                 content = "public " + content;
 
@@ -84,12 +87,12 @@ namespace CSVToESLib
 
         private static void CreateNamespace(ISourceWriter sourceWriter, int assemblyNumber)
         {
-            sourceWriter.Namespace($"CsvToEsLib{AssemblyNumber}".AddBlock());
+            sourceWriter.Namespace($"CsvToEsLib{AssemblyNumber}");
         }
 
         private static void CreateParse(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write(FirstLine($"ParallelQuery<CsvMappingResult<{CsvImportClassNames.BulkPrice}>> Parse(string filePath", false));
+            sourceWriter.Write(FirstLine($"ParallelQuery<CsvMappingResult<{CsvImportClassNames.BulkPrice}>> Parse(string filePath)", false));
             sourceWriter.Write("CsvParserOptions csvParserOptions = new CsvParserOptions(true, ';');");
             sourceWriter.Write($"{CsvImportClassNames.CsvBulkPriceMapping} csvMapper = new {CsvImportClassNames.CsvBulkPriceMapping}();");
             sourceWriter.Write($"CsvParser<{CsvImportClassNames.BulkPrice}> csvParser = new CsvParser<{CsvImportClassNames.BulkPrice}>(csvParserOptions, csvMapper);");
@@ -100,17 +103,17 @@ namespace CSVToESLib
         {
             foreach (var item in data.fields)
             {
-                sourceWriter.Write($"public string {item};)");
+                sourceWriter.Write($"public string {item};");
             }
-            sourceWriter.Write($"public string Version = {data.version};");
+            sourceWriter.Write($"public int Version = {data.version};");
         }
 
         private static void CreatePocoMappingCtor(ISourceWriter sourceWriter, string[] fields)
         {
             sourceWriter.Write(FirstLine($"{CsvImportClassNames.CsvBulkPriceMapping}() : base()", false));
-            for (int i = 0; i < fields.Length - 1; i++)
+            for (int i = 0; i < fields.Length; i++)
             {
-                sourceWriter.Write($"MapProperty({i}, x => x.{fields[i]};");
+                sourceWriter.Write($"MapProperty({i}, x => x.{fields[i]});");
             }
         }
 
@@ -134,15 +137,15 @@ namespace CSVToESLib
 
         private static void CreateIndexCtor(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write(FirstLine($"{CsvImportClassNames.Index}()", false));
-            sourceWriter.Write($"{CsvImportClassNames.BulkPrice} = {CsvImportClassNames.BulkPrice};");
-            sourceWriter.Write($"{CsvImportClassNames.InnerIndex} = {CsvImportClassNames.InnerIndex};");
+            sourceWriter.Write(FirstLine($"{CsvImportClassNames.Index}({CsvImportClassNames.BulkPrice} {CsvImportClassNames.BulkPrice.ToLower()})", false));
+            sourceWriter.Write($"{CsvImportClassNames.BulkPrice} = {CsvImportClassNames.BulkPrice.ToLower()};");
+            sourceWriter.Write($"{CsvImportClassNames.InnerIndex} = new {CsvImportClassNames.InnerIndex}();");
         }
 
         private static void CreateInnerIndexFields(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write($"public {CsvImportClassNames._index} {CsvImportClassNames._index};");
-            sourceWriter.Write($"public {CsvImportClassNames._type} {CsvImportClassNames._type};");
+            sourceWriter.Write($"public string {CsvImportClassNames._index};");
+            sourceWriter.Write($"public string {CsvImportClassNames._type};");
         }
 
         private static void CreateInnerIndexCtor(ISourceWriter sourceWriter)
@@ -150,6 +153,20 @@ namespace CSVToESLib
             sourceWriter.Write(FirstLine($"{CsvImportClassNames.InnerIndex}(string index = \"bulkprices\", string type = \"bulkprice\")", false));
             sourceWriter.Write($"{CsvImportClassNames._index} = index;");
             sourceWriter.Write($"{CsvImportClassNames._type} = type;");
+        }
+
+        private static void CreateCsvImporterFields(ISourceWriter sourceWriter)
+        {
+            sourceWriter.Write($"private {CsvImportClassNames.CsvClient} {CsvImportClassNames.CsvClient} = new {CsvImportClassNames.CsvClient}();");
+        }
+
+        private static void CreateImportCsv(ISourceWriter sourceWriter)
+        {
+            sourceWriter.Write(FirstLine($"async Task<bool> ImportCsv(ConnectionConfiguration connection, string filePath, int version)", false));
+            sourceWriter.Write($"var {CsvImportClassNames.ElasticsearchClient} = new {CsvImportClassNames.ElasticsearchClient}(connection);");
+            sourceWriter.Write($"var result = await {CsvImportClassNames.ElasticsearchClient}.BulkInsert({CsvImportClassNames.CsvClient}.Parse(filePath));");
+            sourceWriter.Write($"return result.Success;");
+
         }
     }
 }

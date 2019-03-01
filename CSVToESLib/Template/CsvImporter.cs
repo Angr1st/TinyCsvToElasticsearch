@@ -1,15 +1,16 @@
 ﻿using System.Threading.Tasks;
+using Elasticsearch.Net;
 
 namespace CSVToESLib.Template
 {
     class CsvImporter : ICsvImporter
     {
         CSVClient CSVClient = new CSVClient();
-        ElasticsearchClient ElasticsearchClient = new ElasticsearchClient();
 
-        public async Task<bool> ImportCSV(string filePath, int version)
+        public async Task<bool> ImportCsv(ConnectionConfiguration connection, string filePath, int version)
         {
-            var result = await ElasticsearchClient.BulkInsert(CSVClient.Parse(filePath));
+            var ElasticsearClient = new ElasticsearchClient(connection);
+            var result = await ElasticsearClient.BulkInsert(CSVClient.Parse(filePath));
             return result.Success;
         }
     }

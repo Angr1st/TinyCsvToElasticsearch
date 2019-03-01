@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Elasticsearch.Net;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,6 +8,6 @@ namespace CSVToESLib
 {
     public interface ICsvImporter
     {
-        Task<bool> ImportCSV(string filePath, int version);
+        Task<bool> ImportCsv(ConnectionConfiguration connection, string filePath, int version);
     }
 }
