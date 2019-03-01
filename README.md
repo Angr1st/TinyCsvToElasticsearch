@@ -1,4 +1,4 @@
-﻿#Todo
+# Todo
 
 - [x] Person Class
 - [x] CSVPersonMapping : CsvMapping<Person>
