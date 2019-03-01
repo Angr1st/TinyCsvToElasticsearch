@@ -8,9 +8,11 @@ using TinyCsvParser.Mapping;
 
 namespace CSVToESLib
 {
-    public class CsvImporterGenerator
+    public static class CsvImporterGenerator
     {
         private static int AssemblyNumber = 0;
+        private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Elasticsearch.Net", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser" };
+
 
         private static ICsvImporter CreateBulkPriceImporterType(string[] fields, int version)
         {
@@ -29,8 +31,9 @@ namespace CSVToESLib
 
             var assembly = generator.Generate(x =>
             {
-                var writer = new SourceWriter(x);
-                writer.WriteNamespace(CreateNamespace, AssemblyNumber)
+                var writer = new SourceWriter(x)
+                .WriteUsingStatements(CreateUsings, Usings)
+                .WriteNamespace(CreateNamespace, AssemblyNumber)
                 .WriteClass((y) => y.Write(FirstLine(CsvImportClassNames.CsvClient)))
                 .WriteMethod(CreateParse)
                 .FinishBlock()
@@ -58,7 +61,7 @@ namespace CSVToESLib
             });
 
             assembly.GetExportedTypes().Single();
-            return assembly.CreateInstance() as ICsvImporter;
+            return assembly.CreateInstance(CsvImportClassNames.CsvImporter) as ICsvImporter;
         }
 
         private static string FirstLine(string content, bool isClass = true)
@@ -69,6 +72,14 @@ namespace CSVToESLib
                 content = "public " + content;
 
             return content.AddBlock();
+        }
+
+        private static void CreateUsings(ISourceWriter sourceWriter, string[] usings)
+        {
+            foreach (var item in usings)
+            {
+                sourceWriter.UsingNamespace(item);
+            }
         }
 
         private static void CreateNamespace(ISourceWriter sourceWriter, int assemblyNumber)
@@ -140,33 +151,5 @@ namespace CSVToESLib
             sourceWriter.Write($"{CsvImportClassNames._index} = index;");
             sourceWriter.Write($"{CsvImportClassNames._type} = type;");
         }
-
-        private static ISourceWriter CreateClass(ISourceWriter sourceWriter, string className, Type type, Action<ISourceWriter> action)
-        {
-            return CreateClass(sourceWriter, className, type, new List<Action<ISourceWriter>>() { action });
-        }
-
-        private static ISourceWriter CreateClass(ISourceWriter sourceWriter, string className, Type type, List<Action<ISourceWriter>> actions)
-        {
-            if (type == null)
-            {
-                sourceWriter.StartClass(className);
-            }
-            else
-            {
-                sourceWriter.StartClass(className, type);
-            }
-
-            foreach (var action in actions)
-            {
-                action(sourceWriter);
-                sourceWriter.FinishBlock();
-            }
-            sourceWriter.FinishBlock();
-            return sourceWriter;
-        }
-
-
-        public string NameGenerator() => new Guid().ToString();
     }
 }
