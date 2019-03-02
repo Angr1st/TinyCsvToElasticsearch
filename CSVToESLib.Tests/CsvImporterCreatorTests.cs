@@ -17,5 +17,16 @@ namespace CSVToESLib.Tests
 
             Assert.NotEqual(test, test2);
         }
+
+        [Fact]
+        public void Test2()
+        {
+            string[] nameArray = new string[] { "SystemThreadingTasks", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
+
+            var test = CsvImporterGenerator.CreateBulkPriceImporterType(nameArray);
+            var test2 = CsvImporterGenerator.CreateBulkPriceImporterType(nameArray);
+
+            Assert.Equal(test, test2);
+        }
     }
 }
