@@ -7,7 +7,7 @@ namespace CSVToESLib.Tests
     public class CsvImporterGeneratorTests
     {
         [Fact]
-        public void Test1()
+        public void CachingTestDifferent()
         {
             string[] nameArray = new string[] { "SystemThreadingTasks", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
             string[] newArray = new string[] { "SystemThreadingTasks1", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
@@ -19,7 +19,7 @@ namespace CSVToESLib.Tests
         }
 
         [Fact]
-        public void Test2()
+        public void ChachingTestSame()
         {
             string[] nameArray = new string[] { "SystemThreadingTasks", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
 
