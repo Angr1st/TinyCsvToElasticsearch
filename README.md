@@ -8,6 +8,6 @@
 - [x] Index
 - [x] ElasticsearchClient
 - [x] ElasticsearchClient Method: async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<Person>> results)
-- [ ] CSVImporter
-- [ ] Create some kind of store for the different created types
+- [x] CSVImporter
+- [x] Create some kind of store for the different created types
 - [ ] Create tests
