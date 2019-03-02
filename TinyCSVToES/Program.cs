@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using CSVToESLib;
 using static System.Console;
 
@@ -6,15 +9,15 @@ namespace TinyCSVToES
 {
     class Program
     {
-        static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            string[] nameArray = new string[] { "SystemThreadingTasks", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
-            string[] newArray = new string[] { "SystemThreadingTasks1", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
+            var filePath = "testData.csv";
+            var test = CsvImporterGenerator.CreateBulkPriceImporterType(GetHeaders(filePath));
 
-            var test = CsvImporterGenerator.CreateBulkPriceImporterType(nameArray);
-            var test2 = CsvImporterGenerator.CreateBulkPriceImporterType(newArray);
-
+            var taskResult = await test.ImportCsv(null, filePath, 1);
             ReadLine();
         }
+
+        public static string[] GetHeaders(string filePath) => File.ReadAllLines(filePath).First().Split(';').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
     }
 }
