@@ -11,6 +11,7 @@
 - [x] CSVImporter
 - [x] Create some kind of store for the different created types
 - [x] Create tests
+- [x] Create License.md
 - [ ] Set up CI
 - [ ] Set up CD
 - [ ] Publish Nuget Package
