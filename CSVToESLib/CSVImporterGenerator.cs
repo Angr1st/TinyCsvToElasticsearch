@@ -12,9 +12,14 @@ namespace CSVToESLib
     {
         private static int AssemblyNumber = 0;
         private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Elasticsearch.Net", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser", "CSVToESLib" };
-
+        private static Dictionary<(string[], int), ICsvImporter> ImplementationStore = new Dictionary<(string[], int), ICsvImporter>();
         public static ICsvImporter CreateBulkPriceImporterType(string[] fields, int version)
         {
+            if (ImplementationStore.TryGetValue((fields,version), out ICsvImporter csvImporter))
+            {
+                return csvImporter;
+            }
+
             var generator = new AssemblyGenerator();
 
             generator.ReferenceAssembly(typeof(ICsvImporter).Assembly);
@@ -33,38 +38,80 @@ namespace CSVToESLib
                 var writer = new SourceWriter(x)
                 .WriteUsingStatements(CreateUsings, Usings)
                 .WriteNamespace(CreateNamespace, AssemblyNumber)
-                .WriteClass((y) => y.Write(FirstLine(CsvImportClassNames.CsvClient)))
-                .WriteMethod(CreateParse)
-                .FinishBlock()
-                .WriteClass(y => y.Write(FirstLine($"{CsvImportClassNames.CsvBulkPriceMapping} : {CsvImportClassNames.CsvMapping}<{CsvImportClassNames.BulkPrice}>")))
-                .WriteMethod(CreatePocoMappingCtor, fields)
-                .FinishBlock()
-                .WriteClass(y => y.Write(FirstLine(CsvImportClassNames.BulkPrice)))
-                .WriteFields(CreateBulkPriceImportPOCOFields, (fields, version))
-                .FinishBlock()
-                .WriteClass(y => y.Write(FirstLine(CsvImportClassNames.ElasticsearchClient)))
-                .WriteFields(y => y.Write("ElasticLowLevelClient ElasticLowLevelClient { get; set; }"))
-                .WriteMethod(CreateElasticsearchClientCtor)
-                .WriteMethod(CreateAsyncBulkInsert)
-                .FinishBlock()
-                .WriteClass(y => y.Write(FirstLine(CsvImportClassNames.Index)))
-                .WriteFields(CreateIndexFields)
-                .WriteMethod(CreateIndexCtor)
-                .FinishBlock()
-                .WriteClass(y => y.Write(FirstLine(CsvImportClassNames.InnerIndex)))
-                .WriteFields(CreateInnerIndexFields)
-                .WriteMethod(CreateInnerIndexCtor)
-                .WriteClass(y => y.Write(FirstLine($"{CsvImportClassNames.CsvImporter} : {CsvImportClassNames.ICsvImporter}")))
-                .WriteFields(CreateCsvImporterFields)
-                .WriteMethod(CreateImportCsv)
-                .FinishBlock(true);
+                .CreateCsvClient()
+                .CreateCsvBulkPriceMapping(fields)
+                .CreateBulkPrice(fields, version)
+                .CreateElasticsearchClient()
+                .CreateIndex()
+                .CreateInnerIndex()
+                .CreateCsvImporter();
 
                 AssemblyNumber++;
             });
 
             var types = assembly.GetExportedTypes();
             var type = types.FirstOrDefault(z => z.Name == CsvImportClassNames.CsvImporter);
-            return type != null ? Activator.CreateInstance(type) as ICsvImporter : null;
+            var csvImporter1 = type != null ? Activator.CreateInstance(type) as ICsvImporter : null;
+            if (csvImporter1 != null)
+            {
+                ImplementationStore.Add((fields, version), csvImporter1);
+            }
+
+            return csvImporter1;
+        }
+
+        private static SourceWriter CreateCsvClient(this SourceWriter sourceWriter)
+        {
+            return sourceWriter.WriteClass((y) => y.Write(FirstLine(CsvImportClassNames.CsvClient)))
+                .WriteMethod(CreateParse)
+                .FinishBlock();
+        }
+
+        private static SourceWriter CreateBulkPrice(this SourceWriter sourceWriter, string[] fields, int version)
+        {
+            return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.BulkPrice)))
+                .WriteFields(CreateBulkPriceImportPOCOFields, (fields, version))
+                .FinishBlock();
+        }
+
+        private static SourceWriter CreateElasticsearchClient(this SourceWriter sourceWriter)
+        {
+            return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.ElasticsearchClient)))
+                .WriteFields(y => y.Write("ElasticLowLevelClient ElasticLowLevelClient { get; set; }"))
+                .WriteMethod(CreateElasticsearchClientCtor)
+                .WriteMethod(CreateAsyncBulkInsert)
+                .FinishBlock();
+        }
+
+        private static SourceWriter CreateIndex(this SourceWriter sourceWriter)
+        {
+            return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.Index)))
+                .WriteFields(CreateIndexFields)
+                .WriteMethod(CreateIndexCtor)
+                .FinishBlock();
+        }
+
+        private static SourceWriter CreateInnerIndex(this SourceWriter sourceWriter)
+        {
+            return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.InnerIndex)))
+                .WriteFields(CreateInnerIndexFields)
+                .WriteMethod(CreateInnerIndexCtor)
+                .FinishBlock();
+        }
+
+        private static SourceWriter CreateCsvImporter(this SourceWriter sourceWriter)
+        {
+            return sourceWriter.WriteClass(y => y.Write(FirstLine($"{CsvImportClassNames.CsvImporter} : {CsvImportClassNames.ICsvImporter}")))
+                .WriteFields(CreateCsvImporterFields)
+                .WriteMethod(CreateImportCsv)
+                .FinishBlock(true); ;
+        }
+
+        private static SourceWriter CreateCsvBulkPriceMapping(this SourceWriter sourceWriter, string[] fields)
+        {
+            return sourceWriter.WriteClass(y => y.Write(FirstLine($"{CsvImportClassNames.CsvBulkPriceMapping} : {CsvImportClassNames.CsvMapping}<{CsvImportClassNames.BulkPrice}>")))
+                 .WriteMethod(CreatePocoMappingCtor, fields)
+                 .FinishBlock();
         }
 
         private static string FirstLine(string content, bool isClass = true)
@@ -119,8 +166,8 @@ namespace CSVToESLib
 
         private static void CreateElasticsearchClientCtor(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write(FirstLine($"{CsvImportClassNames.ElasticsearchClient}(ConnectionConfiguration configuration)",false));
-            sourceWriter.Write("ElasticLowLevelClient = new ElasticLowLevelClient(configuration);");
+            sourceWriter.Write(FirstLine($"{CsvImportClassNames.ElasticsearchClient}(ConnectionConfiguration configuration)", false));
+            sourceWriter.Write("ElasticLowLevelClient = configuration != null ? new ElasticLowLevelClient(configuration) :  new ElasticLowLevelClient();");
         }
 
         private static void CreateAsyncBulkInsert(ISourceWriter sourceWriter)
