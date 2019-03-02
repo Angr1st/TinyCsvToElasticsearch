@@ -12,11 +12,11 @@ namespace CSVToESLib
     {
         private static int AssemblyNumber = 0;
         private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Elasticsearch.Net", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser", "CSVToESLib" };
-        private static Dictionary<(string[], int), ICsvImporter> ImplementationStore = new Dictionary<(string[], int), ICsvImporter>();
+        private static Dictionary<string[], ICsvImporter> ImplementationStore = new Dictionary<string[], ICsvImporter>();
 
-        public static ICsvImporter CreateBulkPriceImporterType(string[] fields, int version)
+        public static ICsvImporter CreateBulkPriceImporterType(string[] fields)
         {
-            if (ImplementationStore.TryGetValue((fields, version), out ICsvImporter csvImporter))
+            if (ImplementationStore.TryGetValue(fields, out ICsvImporter csvImporter))
             {
                 return csvImporter;
             }
@@ -41,7 +41,7 @@ namespace CSVToESLib
                 .WriteNamespace(CreateNamespace, AssemblyNumber)
                 .CreateCsvClient()
                 .CreateCsvBulkPriceMapping(fields)
-                .CreateBulkPrice(fields, version)
+                .CreateBulkPrice(fields)
                 .CreateElasticsearchClient()
                 .CreateIndex()
                 .CreateInnerIndex()
@@ -55,7 +55,7 @@ namespace CSVToESLib
             var csvImporter1 = type != null ? Activator.CreateInstance(type) as ICsvImporter : null;
             if (csvImporter1 != null)
             {
-                ImplementationStore.Add((fields, version), csvImporter1);
+                ImplementationStore.Add(fields, csvImporter1);
             }
 
             return csvImporter1;
@@ -68,10 +68,10 @@ namespace CSVToESLib
                 .FinishBlock();
         }
 
-        private static SourceWriter CreateBulkPrice(this SourceWriter sourceWriter, string[] fields, int version)
+        private static SourceWriter CreateBulkPrice(this SourceWriter sourceWriter, string[] fields)
         {
             return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.BulkPrice)))
-                .WriteFields(CreateBulkPriceImportPOCOFields, (fields, version))
+                .WriteFields(CreateBulkPriceImportPOCOFields, fields)
                 .FinishBlock();
         }
 
@@ -103,7 +103,6 @@ namespace CSVToESLib
         private static SourceWriter CreateCsvImporter(this SourceWriter sourceWriter)
         {
             return sourceWriter.WriteClass(y => y.Write(FirstLine($"{CsvImportClassNames.CsvImporter} : {CsvImportClassNames.ICsvImporter}")))
-                .WriteFields(CreateCsvImporterFields)
                 .WriteMethod(CreateImportCsv)
                 .FinishBlock(true); ;
         }
@@ -147,13 +146,13 @@ namespace CSVToESLib
             sourceWriter.Write("return csvParser.ReadFromFile(filePath, System.Text.Encoding.UTF8);");
         }
 
-        private static void CreateBulkPriceImportPOCOFields(ISourceWriter sourceWriter, (string[] fields, int version) data)
+        private static void CreateBulkPriceImportPOCOFields(ISourceWriter sourceWriter, string[] fields)
         {
-            foreach (var item in data.fields)
+            foreach (var item in fields)
             {
                 sourceWriter.Write($"public string {item};");
             }
-            sourceWriter.Write($"public int Version = {data.version};");
+            sourceWriter.Write($"public int Version;");
         }
 
         private static void CreatePocoMappingCtor(ISourceWriter sourceWriter, string[] fields)
@@ -173,8 +172,8 @@ namespace CSVToESLib
 
         private static void CreateAsyncBulkInsert(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write(FirstLine($"async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<{CsvImportClassNames.BulkPrice}>> results)", false));
-            sourceWriter.Write("return await ElasticLowLevelClient.BulkAsync<StringResponse>(PostData.MultiJson(results.Where(result => result.IsValid).Select(result => new Object[] { new Index(result.Result) }).Aggregate((newValue, oldValue) => oldValue.Concat(newValue).ToArray())));");
+            sourceWriter.Write(FirstLine($"async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<{CsvImportClassNames.BulkPrice}>> results, int version)", false));
+            sourceWriter.Write("return await ElasticLowLevelClient.BulkAsync<StringResponse>(PostData.MultiJson(results.Where(result => result.IsValid).Select(result => { result.Result.Version = version; return new Object[] { new Index(result.Result) }; }).Aggregate((newValue, oldValue) => oldValue.Concat(newValue).ToArray())));");
         }
 
         private static void CreateIndexFields(ISourceWriter sourceWriter)
@@ -203,16 +202,12 @@ namespace CSVToESLib
             sourceWriter.Write($"{CsvImportClassNames._type} = type;");
         }
 
-        private static void CreateCsvImporterFields(ISourceWriter sourceWriter)
-        {
-            sourceWriter.Write($"private {CsvImportClassNames.CsvClient} {CsvImportClassNames.CsvClient} = new {CsvImportClassNames.CsvClient}();");
-        }
-
         private static void CreateImportCsv(ISourceWriter sourceWriter)
         {
             sourceWriter.Write(FirstLine($"async Task<bool> ImportCsv(ConnectionConfiguration connection, string filePath, int version)", false));
+            sourceWriter.Write($"var {CsvImportClassNames.CsvClient} = new {CsvImportClassNames.CsvClient}();");
             sourceWriter.Write($"var {CsvImportClassNames.ElasticsearchClient} = new {CsvImportClassNames.ElasticsearchClient}(connection);");
-            sourceWriter.Write($"var result = await {CsvImportClassNames.ElasticsearchClient}.BulkInsert({CsvImportClassNames.CsvClient}.Parse(filePath));");
+            sourceWriter.Write($"var result = await {CsvImportClassNames.ElasticsearchClient}.BulkInsert({CsvImportClassNames.CsvClient}.Parse(filePath), version);");
             sourceWriter.Write($"return result.Success;");
 
         }

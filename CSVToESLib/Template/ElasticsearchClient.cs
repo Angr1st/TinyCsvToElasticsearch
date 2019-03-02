@@ -14,9 +14,9 @@ namespace CSVToESLib.Template
             ElasticLowLevelClient = new ElasticLowLevelClient(configuration);
         }
 
-        public async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<Person>> results)
+        public async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<Person>> results, int version)
         {
-            return await ElasticLowLevelClient.BulkAsync<StringResponse>(PostData.MultiJson(results.Where(result => result.IsValid).Select(result => new Object[] { new Index(result.Result) }).Aggregate((newValue, oldValue) => oldValue.Concat(newValue).ToArray())));
+            return await ElasticLowLevelClient.BulkAsync<StringResponse>(PostData.MultiJson(results.Where(result => result.IsValid).Select(result =>{ result.Result.Version = version; return new Object[] { new Index(result.Result) }; }).Aggregate((newValue, oldValue) => oldValue.Concat(newValue).ToArray())));
         }
     }
 

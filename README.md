@@ -10,4 +10,7 @@
 - [x] ElasticsearchClient Method: async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<Person>> results)
 - [x] CSVImporter
 - [x] Create some kind of store for the different created types
-- [ ] Create tests
+- [x] Create tests
+- [ ] Set up CI
+- [ ] Set up CD
+- [ ] Publish Nuget Package

@@ -4,7 +4,7 @@ using TinyCsvParser.Mapping;
 
 namespace CSVToESLib.Template
 {
-    class CSVClient
+    class CsvClient
     {
         public ParallelQuery<CsvMappingResult<Person>> Parse(string filePath)
         {
@@ -33,5 +33,7 @@ namespace CSVToESLib.Template
         public string LastName;
 
         public string BirthDay;
+
+        public int Version;
     }
 }
