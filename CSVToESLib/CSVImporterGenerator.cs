@@ -150,7 +150,7 @@ namespace CSVToESLib
         {
             foreach (var item in fields)
             {
-                sourceWriter.Write($"public string {item};");
+                sourceWriter.Write($"public string {item} {{ get; set; }}");
             }
             sourceWriter.Write($"public int Version;");
         }
