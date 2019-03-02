@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>TinyCsvToElasticsearch</PackageId>
+    <Authors>Torben Clasen</Authors>
+    <Product>TinyCsvToElasticsearch</Product>
+    <Description>This Library provides the means to dynamically create an implementation of an interface. This instance will be custom made for the fields of the csv. There will always be a Version field that is added but that also means that the csv can't contain a version field.</Description>
+    <RepositoryUrl>https://github.com/Angr1st/TinyCsvToElasticsearch</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>Torben Clasen 2019</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
