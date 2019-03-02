@@ -8,9 +8,12 @@ namespace TinyCSVToES
     {
         static void Main(string[] args)
         {
-            string[] nameArray = new string[] { "FirstFüeld", "SecondField" };
-            var version = 1;
-            var newImplementation = CsvImporterGenerator.CreateBulkPriceImporterType(nameArray, version);
+            string[] nameArray = new string[] { "SystemThreadingTasks", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
+            string[] newArray = new string[] { "SystemThreadingTasks1", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
+
+
+                var test = CsvImporterGenerator.CreateBulkPriceImporterType(nameArray, 1);
+            var test2 = CsvImporterGenerator.CreateBulkPriceImporterType(newArray, 1);
 
 
             ReadLine();
