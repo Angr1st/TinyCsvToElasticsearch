@@ -28,7 +28,7 @@ namespace CSVToESLib.Template
         {
             var test = results.Where(result => result.IsValid).Select(result => { result.Result.Version = version; return new Index(result.Result).ToString(); });
             //PostData postData = PostData.MultiJson(test);
-            var isTestAny = test.Any();
+            //var isTestAny = test.Any();
             //File.WriteAllLines("anyTest.txt", test, System.Text.Encoding.UTF8);
             //postData.Write(System.IO.File.OpenWrite("Output2.txt"), new ConnectionConfiguration(uri: null));
             ////System.IO.File.WriteAllLines("output.txt", postData., System.Text.Encoding.UTF8);
