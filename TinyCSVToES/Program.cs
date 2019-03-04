@@ -16,12 +16,12 @@ namespace TinyCSVToES
 
             //var taskResult = await test.ImportCsv(null, filePath, 1);
             //WriteLine(taskResult);
-            var person = new CSVToESLib.Template.Person() { FirstName = "test", BirthDay = "30.12.2012", LastName = "Lol", Version = 1 };
-            var innerIndex = new CSVToESLib.Template.InnerIndex();
-            var index = new CSVToESLib.Template.Index(person);
-            File.WriteAllText("test1.json", innerIndex.ToString(), System.Text.Encoding.UTF8);
-            File.WriteAllText("test.json", person.ToString(), System.Text.Encoding.UTF8);
-            File.WriteAllText("test3.json", index.ToString(), System.Text.Encoding.UTF8);
+            //var person = new CSVToESLib.Template.Person() { FirstName = "test", BirthDay = "30.12.2012", LastName = "Lol", Version = 1 };
+            //var innerIndex = new CSVToESLib.Template.InnerIndex();
+            //var index = new CSVToESLib.Template.Index(person);
+            //File.WriteAllText("test1.json", innerIndex.ToString(), System.Text.Encoding.UTF8);
+            //File.WriteAllText("test.json", person.ToString(), System.Text.Encoding.UTF8);
+            //File.WriteAllText("test3.json", index.ToString(), System.Text.Encoding.UTF8);
             var filePath2 = "testData2.csv";
             var csvImporter = new CSVToESLib.Template.CsvImporter();
             var taskResult2 = await csvImporter.ImportCsv(null, filePath2, 1);
