@@ -26,14 +26,19 @@ namespace CSVToESLib.Template
         }
     }
 
-    class Person
+    public class Person
     {
-        public string FirstName;
+        public string FirstName { get; set; }
 
-        public string LastName;
+        public string LastName { get; set; }
 
-        public string BirthDay;
+        public string BirthDay { get; set; }
 
         public int Version;
+
+        public override string ToString()
+        {
+            return $"{{\"FirstName\":\"{FirstName}\",\"LastName\":\"{LastName}\",\"BirthDay\":\"{BirthDay}\",\"Version\":\"{Version}\"}}";
+        }
     }
 }

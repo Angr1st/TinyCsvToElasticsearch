@@ -1,5 +1,6 @@
 ﻿using Elasticsearch.Net;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TinyCsvParser.Mapping;
@@ -16,11 +17,17 @@ namespace CSVToESLib.Template
 
         public async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<Person>> results, int version)
         {
-            return await ElasticLowLevelClient.BulkAsync<StringResponse>(PostData.MultiJson(results.Where(result => result.IsValid).Select(result =>{ result.Result.Version = version; return new Object[] { new Index(result.Result) }; }).Aggregate((newValue, oldValue) => oldValue.Concat(newValue).ToArray())));
+            var test = results.Where(result => result.IsValid).Select(result => { result.Result.Version = version; return new Index(result.Result).ToString(); });
+            var postData = PostData.MultiJson(test);
+
+            postData.Write(System.IO.File.OpenWrite("Output2.txt"), new ConnectionConfiguration(uri:null));
+            //System.IO.File.WriteAllLines("output.txt", postData., System.Text.Encoding.UTF8);
+
+            return await ElasticLowLevelClient.BulkAsync<StringResponse>(postData);
         }
     }
 
-    internal class Index
+    public class Index
     {
         public InnerIndex InnerIndex;
         public Person Person;
@@ -30,17 +37,27 @@ namespace CSVToESLib.Template
             Person = person;
             InnerIndex = new InnerIndex();
         }
+
+        public override string ToString()
+        {
+            return InnerIndex.ToString() + "\n" + Person.ToString() + "\n";
+        }
     }
 
-    internal class InnerIndex
+    public class InnerIndex
     {
         public string _index;
         public string _type;
 
-        public InnerIndex(string index = "persons", string type = "person")
+        public InnerIndex(string index = null, string type = null)
         {
             _index = index;
             _type = type;
+        }
+
+        public override string ToString()
+        {
+            return "{\"index\":{\"_index\":\"persons\",\"_type\":\"person\"}}";
         }
     }
 }

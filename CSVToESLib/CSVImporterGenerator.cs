@@ -204,12 +204,10 @@ namespace CSVToESLib
 
         private static void CreateImportCsv(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write(FirstLine($"async Task<bool> ImportCsv(ConnectionConfiguration connection, string filePath, int version)", false));
+            sourceWriter.Write(FirstLine($"async Task<StringResponse> ImportCsv(ConnectionConfiguration connection, string filePath, int version)", false));
             sourceWriter.Write($"var {CsvImportClassNames.CsvClient} = new {CsvImportClassNames.CsvClient}();");
             sourceWriter.Write($"var {CsvImportClassNames.ElasticsearchClient} = new {CsvImportClassNames.ElasticsearchClient}(connection);");
-            sourceWriter.Write($"var result = await {CsvImportClassNames.ElasticsearchClient}.BulkInsert({CsvImportClassNames.CsvClient}.Parse(filePath), version);");
-            sourceWriter.Write($"return result.Success;");
-
+            sourceWriter.Write($"return await {CsvImportClassNames.ElasticsearchClient}.BulkInsert({CsvImportClassNames.CsvClient}.Parse(filePath), version);");
         }
     }
 }
