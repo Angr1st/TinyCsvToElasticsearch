@@ -5,6 +5,6 @@ namespace CSVToESLib
 {
     public interface ICsvImporter
     {
-        Task<StringResponse> ImportCsv(ConnectionConfiguration connection, string filePath, int version);
+        Task ImportCsv(ConnectionConfiguration connection, string filePath, int version);
     }
 }

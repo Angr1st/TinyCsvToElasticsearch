@@ -5,11 +5,11 @@ namespace CSVToESLib.Template
 {
     public class CsvImporter : ICsvImporter
     {
-        public async Task<StringResponse> ImportCsv(ConnectionConfiguration connection, string filePath, int version)
+        public async Task ImportCsv(ConnectionConfiguration connection, string filePath, int version)
         {
             var CSVClient = new CsvClient();
             var ElasticsearClient = new ElasticsearchClient(connection);
-            return await ElasticsearClient.BulkInsert(CSVClient.Parse(filePath),version);
+            await ElasticsearClient.BulkInsert(CSVClient.Parse(filePath),version);
         }
     }
 }

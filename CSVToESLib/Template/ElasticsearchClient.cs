@@ -25,18 +25,25 @@ namespace CSVToESLib.Template
             ElasticLowLevelClient = new ElasticLowLevelClient(configuration);
         }
 
-        public async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<Person>> results, int version)
+        public async Task BulkInsert(ParallelQuery<CsvMappingResult<Person>> results, int version)
         {
             var test = results.Where(result => result.IsValid).Select(result => { result.Result.Version = version; return new Index(result.Result).ToString(); });
-            PostData postData = PostData.MultiJson(test.ToList());
-            //var isTestAny = test.Any();
+            //PostData postData = PostData.MultiJson(test);
+            var isTestAny = test.Any();
             //File.WriteAllLines("anyTest.txt", test, System.Text.Encoding.UTF8);
-            postData.Write(System.IO.File.OpenWrite("Output2.txt"), new ConnectionConfiguration(uri: null));
+            //postData.Write(System.IO.File.OpenWrite("Output2.txt"), new ConnectionConfiguration(uri: null));
             ////System.IO.File.WriteAllLines("output.txt", postData., System.Text.Encoding.UTF8);
 
-            return await ElasticLowLevelClient.BulkAsync<StringResponse>(Elasticsearch.Net.PostData.MultiJson(test));
+            await NewMethod(test);
         }
 
+        private async Task NewMethod(ParallelQuery<string> test)
+        {
+            foreach (var item in test.Batch(200000))
+            {
+                await ElasticLowLevelClient.BulkAsync<StringResponse>(Elasticsearch.Net.PostData.MultiJson(item));
+            }
+        }
     }
 
     public class Index

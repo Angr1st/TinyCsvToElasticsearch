@@ -22,10 +22,10 @@ namespace TinyCSVToES
             //File.WriteAllText("test1.json", innerIndex.ToString(), System.Text.Encoding.UTF8);
             //File.WriteAllText("test.json", person.ToString(), System.Text.Encoding.UTF8);
             //File.WriteAllText("test3.json", index.ToString(), System.Text.Encoding.UTF8);
-            var filePath2 = "testData2.csv";
+            var filePath2 = "testData3.csv";
             var csvImporter = new CSVToESLib.Template.CsvImporter();
-            var taskResult2 = await csvImporter.ImportCsv(null, filePath2, 1);
-            WriteLine(taskResult2);
+            await csvImporter.ImportCsv(null, filePath2, 1);
+            WriteLine("Csv Imported!");
             ReadLine();
         }
 
