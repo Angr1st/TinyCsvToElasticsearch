@@ -19,6 +19,6 @@ namespace CSVToESLib
 
         internal static byte[] Utf8Bytes(this string s) => s.IsNullOrEmpty() ? null : Encoding.UTF8.GetBytes(s);
 
-        internal static IEnumerable<T> HasAny<T>(this IEnumerable<T> list) => list != null && list.Any() ? list : new List<T>();
+        internal static bool HasAny<T>(this IEnumerable<T> list) => list != null && list.Any() ;
     }
 }
