@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using TinyCsvParser;
 using TinyCsvParser.Mapping;
 
@@ -6,7 +7,7 @@ namespace CSVToESLib.Template
 {
     class CsvClient
     {
-        public ParallelQuery<CsvMappingResult<Person>> Parse(string filePath)
+        public IEnumerable<CsvMappingResult<Person>> Parse(string filePath)
         {
             CsvParserOptions csvParserOptions = new CsvParserOptions(true, ';');
             CSVPersonMapping csvMapper = new CSVPersonMapping();

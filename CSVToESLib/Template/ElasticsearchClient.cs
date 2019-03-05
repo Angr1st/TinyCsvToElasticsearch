@@ -25,7 +25,7 @@ namespace CSVToESLib.Template
             ElasticLowLevelClient = new ElasticLowLevelClient(configuration);
         }
 
-        public async Task BulkInsert(ParallelQuery<CsvMappingResult<Person>> results, int version)
+        public async Task BulkInsert(IEnumerable<CsvMappingResult<Person>> results, int version)
         {
             var test = results.Where(result => result.IsValid).Select(result => { result.Result.Version = version; return new Index(result.Result).ToString(); });
             //PostData postData = PostData.MultiJson(test);
@@ -37,7 +37,7 @@ namespace CSVToESLib.Template
             await NewMethod(test);
         }
 
-        private async Task NewMethod(ParallelQuery<string> test)
+        private async Task NewMethod(IEnumerable<string> test)
         {
             foreach (var item in test.Batch(200000))
             {
