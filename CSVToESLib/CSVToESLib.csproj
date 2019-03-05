@@ -9,6 +9,7 @@
     <RepositoryUrl>https://github.com/Angr1st/TinyCsvToElasticsearch</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Copyright>Torben Clasen 2019</Copyright>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
