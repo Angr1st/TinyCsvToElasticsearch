@@ -1,5 +1,4 @@
 ﻿using Elasticsearch.Net;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -250,7 +249,7 @@ namespace CSVToESLib.Template
 
         public override async Task WriteAsync(Stream writableStream, IConnectionConfigurationValues settings, CancellationToken cancellationToken)
         {
-            
+
 
             var indent = settings.PrettyJson ? SerializationFormatting.Indented : SerializationFormatting.None;
             MemoryStream ms = null;
