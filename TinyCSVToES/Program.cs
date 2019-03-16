@@ -26,7 +26,7 @@ namespace TinyCSVToES
             //File.WriteAllText("test3.json", index.ToString(), System.Text.Encoding.UTF8);
             var filePath2 = "testData2.csv";
             var csvImporter = new CsvImporter();
-            var settings = new ConnectionSettings(new Uri("http://ipv4.fiddler:9200"))
+            var settings = new ConnectionSettings()
                 .DefaultMappingFor<Person>(m => m
                     .IndexName("persons")
                     .TypeName("person")
