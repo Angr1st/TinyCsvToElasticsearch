@@ -1,15 +1,21 @@
-﻿using System.Threading.Tasks;
-using Elasticsearch.Net;
+﻿using System.Linq;
+using Nest;
 
 namespace CSVToESLib.Template
 {
     public class CsvImporter : ICsvImporter
     {
-        public async Task<StringResponse> ImportCsv(ConnectionConfiguration connection, string filePath, int version)
+        public void ImportCsv(IConnectionSettingsValues settings, string filePath, int version)
         {
-            var CSVClient = new CsvClient();
-            var ElasticsearClient = new ElasticsearchClient(connection);
-            return await ElasticsearClient.BulkInsert(CSVClient.Parse(filePath),version);
+            var csvClient = new CsvClient();
+            var elasticsearchClient = new ElasticsearchClient(settings);
+            var results = csvClient.Parse(filePath).Where(r => r.IsValid).Select(r =>
+            {
+                r.Result.Version = version;
+                return r.Result;
+            });
+
+            elasticsearchClient.BulkInsert(results);
         }
     }
 }
