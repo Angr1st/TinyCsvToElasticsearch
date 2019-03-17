@@ -1,10 +1,11 @@
 ﻿using Elasticsearch.Net;
 using System.Threading.Tasks;
+using Nest;
 
 namespace CSVToESLib
 {
     public interface ICsvImporter
     {
-        Task<StringResponse> ImportCsv(ConnectionConfiguration connection, string filePath, int version);
+        void ImportCsv(IConnectionSettingsValues settings, string filePath, int version);
     }
 }
