@@ -12,7 +12,7 @@ namespace CSVToESLib
     {
         private static int AssemblyNumber = 0;
         private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Elasticsearch.Net", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser", "CSVToESLib" };
-        private static Dictionary<string[], ICsvImporter> ImplementationStore = new Dictionary<string[], ICsvImporter>();
+        private static readonly Dictionary<string[], ICsvImporter> ImplementationStore = new Dictionary<string[], ICsvImporter>();
 
         public static ICsvImporter CreateBulkPriceImporterType(string[] fields)
         {
