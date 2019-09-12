@@ -13,11 +13,23 @@ namespace CSVToESLib.Template
     internal class ElasticsearchClient
     {
         private readonly ElasticClient _elasticClient;
-             
+
+        private readonly BulkAllObserver BulkAllObserver = new BulkAllObserver(
+                onNext: b =>
+                {
+                    // do something e.g. write number of pages to console
+                },
+                onError: e =>
+                {
+                    exception = e;
+                    waitHandle.Set();
+                },
+                onCompleted: () => waitHandle.Set());
+
         public ElasticsearchClient(IConnectionSettingsValues settings) => 
             _elasticClient = new ElasticClient(settings);
 
-        public IDisposable BulkInsert<T>(IEnumerable<T> results, BulkAllObserver observer) where T : class
+        public async Task<Result<int,Exception>> BulkInsert<T>(IEnumerable<T> results) where T : class
         {
             var bulkAllObservable = _elasticClient.BulkAll(results, b => b
                 .Index(IndexName.From<T>())
@@ -26,20 +38,8 @@ namespace CSVToESLib.Template
                 .MaxDegreeOfParallelism(Environment.ProcessorCount)
                 .Size(5000)
             );
-            
-            //var bulkAllObserver = new BulkAllObserver(
-            //    onNext: b =>
-            //    {
-            //        // do something e.g. write number of pages to console
-            //    },
-            //    onError: e =>
-            //    {
-            //        exception = e;
-            //        waitHandle.Set();
-            //    },
-            //    onCompleted: () => waitHandle.Set());
-
-            return bulkAllObservable.Subscribe(observer);
+            bulkAllObservable.Subscribe(BulkAllObserver);
+            return 
         }
     }
 }
