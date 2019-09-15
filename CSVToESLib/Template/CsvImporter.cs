@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Nest;
 
 namespace CSVToESLib.Template
 {
     public class CsvImporter : ICsvImporter
     {
-        public IDisposable ImportCsv(IConnectionSettingsValues settings, string filePath, int version, BulkAllObserver bulkAllObserver)
+        public async Task<Result<int, Exception>> ImportCsv(IConnectionSettingsValues settings, string filePath, int version)
         {
             var csvClient = new CsvClient();
             var elasticsearchClient = new ElasticsearchClient(settings);
@@ -15,8 +16,8 @@ namespace CSVToESLib.Template
                 r.Result.Version = version;
                 return r.Result;
             });
-
-           return elasticsearchClient.BulkInsert(results, bulkAllObserver);
+            var elasticsearchCon = new ElasticsearchConnection();
+            return await elasticsearchClient.BulkInsert(elasticsearchCon, results);
         }
     }
 }
