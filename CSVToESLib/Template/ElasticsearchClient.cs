@@ -14,32 +14,28 @@ namespace CSVToESLib.Template
     {
         private readonly ElasticClient _elasticClient;
 
-        private readonly BulkAllObserver BulkAllObserver = new BulkAllObserver(
-                onNext: b =>
-                {
-                    // do something e.g. write number of pages to console
-                },
-                onError: e =>
-                {
-                    exception = e;
-                    waitHandle.Set();
-                },
-                onCompleted: () => waitHandle.Set());
+        public ElasticsearchClient(IConnectionSettingsValues settings) => _elasticClient = new ElasticClient(settings);
 
-        public ElasticsearchClient(IConnectionSettingsValues settings) => 
-            _elasticClient = new ElasticClient(settings);
-
-        public async Task<Result<int,Exception>> BulkInsert<T>(IEnumerable<T> results) where T : class
+        public async Task<Result<int, Exception>> BulkInsert<T>(ElasticsearchConnection con, IEnumerable<T> results) where T : class
         {
-            var bulkAllObservable = _elasticClient.BulkAll(results, b => b
-                .Index(IndexName.From<T>())
-                .Type(TypeName.From<T>())
-                .RefreshOnCompleted()
-                .MaxDegreeOfParallelism(Environment.ProcessorCount)
-                .Size(5000)
-            );
-            bulkAllObservable.Subscribe(BulkAllObserver);
-            return 
+            try
+            {
+                var bulkAllObservable = _elasticClient.BulkAll(results, b => b
+                    .Index(IndexName.From<T>())
+                    .Type(TypeName.From<T>())
+                    .RefreshOnCompleted()
+                    .MaxDegreeOfParallelism(Environment.ProcessorCount)
+                    .Size(5000)
+                );
+                bulkAllObservable.Subscribe(con.BulkAllObserver);
+                await con.WaitForCompletion();
+
+                return new Result<int, Exception>(con.RecordCount);
+            }
+            catch (Exception e)
+            {
+                return new Result<int, Exception>(e);
+            }
         }
     }
 }
