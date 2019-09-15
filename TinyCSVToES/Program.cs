@@ -31,7 +31,7 @@ namespace TinyCSVToES
                     .IndexName("persons")
                     .TypeName("person")
                 );
-            csvImporter.ImportCsv(settings, filePath2, 1);
+            var result = await csvImporter.ImportCsv(settings, filePath2, 1);
             
             ReadLine();
         }
