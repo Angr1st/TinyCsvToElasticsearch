@@ -2,11 +2,12 @@
 using System.Threading.Tasks;
 using Nest;
 using System;
+using CSVToESLib.Template;
 
 namespace CSVToESLib
 {
     public interface ICsvImporter
     {
-        IDisposable ImportCsv(IConnectionSettingsValues settings, string filePath, int version, BulkAllObserver bulkAllObserver);
+        Task<Result<int, Exception>> ImportCsv(IConnectionSettingsValues settings, string filePath, int version);
     }
 }
