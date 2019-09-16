@@ -1,4 +1,5 @@
 ﻿using Elasticsearch.Net;
+using LamarCodeGeneration;
 using LamarCompiler;
 using System;
 using System.Collections.Generic;
