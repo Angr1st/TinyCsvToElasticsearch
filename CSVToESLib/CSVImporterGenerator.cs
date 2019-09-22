@@ -167,7 +167,7 @@ namespace CSVToESLib
 
         private static void CreateElasticsearchClientCtor(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write(FirstLine($"{CsvImportClassNames.ElasticsearchClient}(IConnectionSettingsValues settings) => _elasticClient = new ElasticClient(settings);", false));
+            sourceWriter.Write($"public {CsvImportClassNames.ElasticsearchClient}(IConnectionSettingsValues settings) => _elasticClient = new ElasticClient(settings);");
         }
 
         private static void CreateAsyncBulkInsert(ISourceWriter sourceWriter)
