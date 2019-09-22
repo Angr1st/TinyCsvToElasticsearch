@@ -12,6 +12,10 @@ namespace CSVToESLib.Types
 
         public TypeNames(string typeName)
         {
+            if (String.IsNullOrWhiteSpace(typeName))
+            {
+                throw new ArgumentNullException(nameof(typeName));
+            }
             TypeName = typeName;
             TypeMappingName = $"Csv{TypeName}Mapping";
         }
