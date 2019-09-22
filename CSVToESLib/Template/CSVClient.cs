@@ -8,9 +8,9 @@ namespace CSVToESLib.Template
     {
         public ParallelQuery<CsvMappingResult<Person>> Parse(string filePath)
         {
-            CsvParserOptions csvParserOptions = new CsvParserOptions(true, ';');
-            CSVPersonMapping csvMapper = new CSVPersonMapping();
-            CsvParser<Person> csvParser = new CsvParser<Person>(csvParserOptions, csvMapper);
+            var csvParserOptions = new CsvParserOptions(true, ';');
+            var csvMapper = new CSVPersonMapping();
+            var csvParser = new CsvParser<Person>(csvParserOptions, csvMapper);
 
             return csvParser.ReadFromFile(filePath, System.Text.Encoding.UTF8);
         }
