@@ -11,13 +11,14 @@ using CSVToESLib.Constants;
 using CSVToESLib.Interfaces;
 using SourceWriter = CSVToESLib.Types.SourceWriter;
 using System.Text;
+using Nest;
 
 namespace CSVToESLib
 {
     public static class CsvImporterGenerator
     {
         private static int AssemblyNumber = 0;
-        private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Elasticsearch.Net", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser", "CSVToESLib" };
+        private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Nest", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser", "CSVToESLib" };
         private static readonly Dictionary<string[], ICsvImporter> ImplementationStore = new Dictionary<string[], ICsvImporter>();
         private static readonly AssemblyGenerator Generator = new AssemblyGenerator();
 
@@ -34,10 +35,10 @@ namespace CSVToESLib
             Generator.ReferenceAssembly(typeof(CsvMapping<>).Assembly);
             Generator.ReferenceAssembly(typeof(System.Text.Encoding).Assembly);
             Generator.ReferenceAssembly(typeof(ConnectionConfiguration).Assembly);
-            Generator.ReferenceAssembly(typeof(ElasticLowLevelClient).Assembly);
             Generator.ReferenceAssembly(typeof(StringResponse).Assembly);
             Generator.ReferenceAssembly(typeof(Task<>).Assembly);
             Generator.ReferenceAssembly(typeof(PostData).Assembly);
+            Generator.ReferenceAssembly(typeof(ElasticClient).Assembly);
 
             var assembly = Generator.Generate(x =>
             {
@@ -83,7 +84,7 @@ namespace CSVToESLib
         {
             return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.ElasticsearchClient)))
                 .WriteFields(y => y.Write("private ElasticClient _elasticClient;"))
-                .WriteMethod(CreateElasticsearchClientCtor)
+                .WriteMethod(CreateElasticsearchClientCtor,true)
                 .WriteMethod(CreateAsyncBulkInsert)
                 .FinishBlock();
         }

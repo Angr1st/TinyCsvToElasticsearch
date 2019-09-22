@@ -60,10 +60,14 @@ namespace CSVToESLib.Types
             return this;
         }
 
-        internal SourceWriter WriteMethod(Action<ISourceWriter> action)
+        internal SourceWriter WriteMethod(Action<ISourceWriter> action, bool expressionBody = false)
         {
             action(Writer);
-            Writer.FinishBlock();
+            if (!expressionBody)
+            {
+                Writer.FinishBlock();
+            }
+
 
             return this;
         }
