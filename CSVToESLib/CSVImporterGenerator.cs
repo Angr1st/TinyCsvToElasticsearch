@@ -10,6 +10,7 @@ using CSVToESLib.Extensions;
 using CSVToESLib.Constants;
 using CSVToESLib.Interfaces;
 using SourceWriter = CSVToESLib.Types.SourceWriter;
+using System.Text;
 
 namespace CSVToESLib
 {
@@ -76,6 +77,7 @@ namespace CSVToESLib
         {
             return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.BulkPrice)))
                 .WriteFields(CreateBulkPriceImportPOCOFields, fields)
+                .WriteMethod(CreateBulkPriceToStringOverride, fields)
                 .FinishBlock();
         }
 
@@ -157,6 +159,19 @@ namespace CSVToESLib
                 sourceWriter.Write($"public string {item} {{ get; set; }}");
             }
             sourceWriter.Write($"public int Version;");
+        }
+
+        private static void CreateBulkPriceToStringOverride(ISourceWriter sourceWriter, string[] fields)
+        {
+            sourceWriter.Write(FirstLine($"override string ToString()"));
+            var stringBuild = new StringBuilder("return $\"{");
+            foreach (var item in fields)
+            {
+                stringBuild.Append($"\"{item}\":\"{{{item}}}\",");
+            }
+            stringBuild.Remove(stringBuild.Length - 1, 1);
+            stringBuild.Append("\"};");
+            sourceWriter.Write(stringBuild.ToString());
         }
 
         private static void CreatePocoMappingCtor(ISourceWriter sourceWriter, string[] fields)
