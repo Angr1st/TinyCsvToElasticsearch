@@ -34,10 +34,7 @@ namespace CSVToESLib
             Generator.ReferenceAssembly(typeof(CsvMappingResult<>).Assembly);
             Generator.ReferenceAssembly(typeof(CsvMapping<>).Assembly);
             Generator.ReferenceAssembly(typeof(System.Text.Encoding).Assembly);
-            Generator.ReferenceAssembly(typeof(ConnectionConfiguration).Assembly);
-            Generator.ReferenceAssembly(typeof(StringResponse).Assembly);
             Generator.ReferenceAssembly(typeof(Task<>).Assembly);
-            Generator.ReferenceAssembly(typeof(PostData).Assembly);
             Generator.ReferenceAssembly(typeof(ElasticClient).Assembly);
 
             var assembly = Generator.Generate(x =>
