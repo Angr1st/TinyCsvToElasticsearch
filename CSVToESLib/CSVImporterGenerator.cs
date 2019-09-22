@@ -23,7 +23,7 @@ namespace CSVToESLib
         private static readonly Dictionary<string[], ICsvImporter> ImplementationStore = new Dictionary<string[], ICsvImporter>();
         private static readonly AssemblyGenerator Generator = new AssemblyGenerator();
 
-        public static ICsvImporter CreateBulkPriceImporterType(string[] fields, TypeNames typeNames) 
+        public static ICsvImporter CreateICsvImporterType(string[] fields, TypeNames typeNames, int chunkSize = 5000) 
         {
             if (ImplementationStore.TryGetValue(fields, out var csvImporter))
             {
@@ -47,7 +47,7 @@ namespace CSVToESLib
                 .CreateCsvBulkPriceMapping(fields, typeNames)
                 .CreateBulkPrice(fields, typeNames)
                 .CreateElasticsearchClient()
-                .CreateCsvImporter();
+                .CreateCsvImporter(chunkSize);
 
                 AssemblyNumber++;
             });
@@ -87,10 +87,10 @@ namespace CSVToESLib
                 .FinishBlock();
         }
 
-        private static SourceWriter CreateCsvImporter(this SourceWriter sourceWriter)
+        private static SourceWriter CreateCsvImporter(this SourceWriter sourceWriter, int chunkSize)
         {
             return sourceWriter.WriteClass(y => y.Write(FirstLine($"{CsvImportClassNames.CsvImporter} : {CsvImportClassNames.ICsvImporter}")))
-                .WriteMethod(CreateImportCsv)
+                .WriteMethod(CreateImportCsv, chunkSize)
                 .FinishBlock(true); ;
         }
 
@@ -180,13 +180,13 @@ namespace CSVToESLib
             sourceWriter.Write("return new Result<int, Exception>(e); }");
         }
 
-        private static void CreateImportCsv(ISourceWriter sourceWriter)
+        private static void CreateImportCsv(ISourceWriter sourceWriter, int chunkSize)
         {
-            sourceWriter.Write(FirstLine($"async Task<Result<int, Exception>> ImportCsv(IConnectionSettingsValues settings, string filePath, int version)", false));
+            sourceWriter.Write(FirstLine($"async Task<Result<int, Exception>> ImportCsv(IConnectionSettingsValues settings, string filePath, int version, int chunkSize)", false));
             sourceWriter.Write($"var {CsvImportClassNames.CsvClient} = new {CsvImportClassNames.CsvClient}();");
             sourceWriter.Write($"var {CsvImportClassNames.ElasticsearchClient} = new {CsvImportClassNames.ElasticsearchClient}(settings);");
             sourceWriter.Write($"var results = {CsvImportClassNames.CsvClient}.Parse(filePath).Where(r => r.IsValid).Select(r => {{ r.Result.Version = version; return r.Result; }}); ");
-            sourceWriter.Write($"var elasticsearchCon = new {nameof(ElasticsearchConnection)}();");
+            sourceWriter.Write($"var elasticsearchCon = new {nameof(ElasticsearchConnection)}({nameof(chunkSize)});");
             sourceWriter.Write($"return await {CsvImportClassNames.ElasticsearchClient}.BulkInsert(elasticsearchCon, results);");
         }
     }

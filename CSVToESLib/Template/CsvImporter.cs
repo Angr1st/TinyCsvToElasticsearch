@@ -9,7 +9,7 @@ namespace CSVToESLib.Template
 {
     public class CsvImporter : ICsvImporter
     {
-        public async Task<Result<int, Exception>> ImportCsv(IConnectionSettingsValues settings, string filePath, int version)
+        public async Task<Result<int, Exception>> ImportCsv(IConnectionSettingsValues settings, string filePath, int version, int chunkSize)
         {
             var csvClient = new CsvClient();
             var elasticsearchClient = new ElasticsearchClient(settings);
@@ -18,7 +18,7 @@ namespace CSVToESLib.Template
                 r.Result.Version = version;
                 return r.Result;
             });
-            var elasticsearchCon = new ElasticsearchConnection(5000);
+            var elasticsearchCon = new ElasticsearchConnection(chunkSize);
             return await elasticsearchClient.BulkInsert(elasticsearchCon, results);
         }
     }

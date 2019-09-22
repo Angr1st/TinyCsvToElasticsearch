@@ -8,6 +8,6 @@ namespace CSVToESLib.Interfaces
 {
     public interface ICsvImporter
     {
-        Task<Result<int, Exception>> ImportCsv(IConnectionSettingsValues settings, string filePath, int version);
+        Task<Result<int, Exception>> ImportCsv(IConnectionSettingsValues settings, string filePath, int version, int chunksize = 5000);
     }
 }

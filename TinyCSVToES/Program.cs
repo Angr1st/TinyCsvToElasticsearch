@@ -26,7 +26,7 @@ namespace TinyCSVToES
             //File.WriteAllText("test3.json", index.ToString(), System.Text.Encoding.UTF8);
             var typeNames = new TypeNames("Person");
             var filePath2 = "testData3.csv";
-            var csvImporter = CsvImporterGenerator.CreateBulkPriceImporterType(GetHeaders(filePath2), typeNames);
+            var csvImporter = CsvImporterGenerator.CreateICsvImporterType(GetHeaders(filePath2), typeNames);
             var settings = new ConnectionSettings().DefaultIndex("persons");
             var result = await csvImporter.ImportCsv(settings, filePath2, 1);
 

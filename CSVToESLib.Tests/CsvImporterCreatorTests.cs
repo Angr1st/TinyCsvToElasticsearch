@@ -15,8 +15,8 @@ namespace CSVToESLib.Tests
             string[] nameArray = new string[] { "SystemThreadingTasks", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
             string[] newArray = new string[] { "SystemThreadingTasks1", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
 
-            var test = CsvImporterGenerator.CreateBulkPriceImporterType(nameArray, typeNames);
-            var test2 = CsvImporterGenerator.CreateBulkPriceImporterType(newArray, typeNames);
+            var test = CsvImporterGenerator.CreateICsvImporterType(nameArray, typeNames);
+            var test2 = CsvImporterGenerator.CreateICsvImporterType(newArray, typeNames);
 
             Assert.NotEqual(test, test2);
         }
@@ -26,8 +26,8 @@ namespace CSVToESLib.Tests
         {
             string[] nameArray = new string[] { "SystemThreadingTasks", "ElasticsearchNet", "SystemK", "SystemLinq", "TinyCsvParserMapping", "TinyCsvParserK", "CSVToESLibK", "SystemConsole", "Person", "Test" };
 
-            var test = CsvImporterGenerator.CreateBulkPriceImporterType(nameArray, typeNames);
-            var test2 = CsvImporterGenerator.CreateBulkPriceImporterType(nameArray, typeNames);
+            var test = CsvImporterGenerator.CreateICsvImporterType(nameArray, typeNames);
+            var test2 = CsvImporterGenerator.CreateICsvImporterType(nameArray, typeNames);
 
             Assert.Equal(test, test2);
         }
