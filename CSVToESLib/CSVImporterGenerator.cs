@@ -18,6 +18,7 @@ namespace CSVToESLib
         private static int AssemblyNumber = 0;
         private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Elasticsearch.Net", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser", "CSVToESLib" };
         private static readonly Dictionary<string[], ICsvImporter> ImplementationStore = new Dictionary<string[], ICsvImporter>();
+        private static readonly AssemblyGenerator Generator = new AssemblyGenerator();
 
         public static ICsvImporter CreateBulkPriceImporterType(string[] fields)
         {
@@ -26,20 +27,18 @@ namespace CSVToESLib
                 return csvImporter;
             }
 
-            var generator = new AssemblyGenerator();
+            Generator.ReferenceAssembly(typeof(ICsvImporter).Assembly);
+            Generator.ReferenceAssembly(typeof(ParallelQuery<>).Assembly);
+            Generator.ReferenceAssembly(typeof(CsvMappingResult<>).Assembly);
+            Generator.ReferenceAssembly(typeof(CsvMapping<>).Assembly);
+            Generator.ReferenceAssembly(typeof(System.Text.Encoding).Assembly);
+            Generator.ReferenceAssembly(typeof(ConnectionConfiguration).Assembly);
+            Generator.ReferenceAssembly(typeof(ElasticLowLevelClient).Assembly);
+            Generator.ReferenceAssembly(typeof(StringResponse).Assembly);
+            Generator.ReferenceAssembly(typeof(Task<>).Assembly);
+            Generator.ReferenceAssembly(typeof(PostData).Assembly);
 
-            generator.ReferenceAssembly(typeof(ICsvImporter).Assembly);
-            generator.ReferenceAssembly(typeof(ParallelQuery<>).Assembly);
-            generator.ReferenceAssembly(typeof(CsvMappingResult<>).Assembly);
-            generator.ReferenceAssembly(typeof(CsvMapping<>).Assembly);
-            generator.ReferenceAssembly(typeof(System.Text.Encoding).Assembly);
-            generator.ReferenceAssembly(typeof(ConnectionConfiguration).Assembly);
-            generator.ReferenceAssembly(typeof(ElasticLowLevelClient).Assembly);
-            generator.ReferenceAssembly(typeof(StringResponse).Assembly);
-            generator.ReferenceAssembly(typeof(Task<>).Assembly);
-            generator.ReferenceAssembly(typeof(PostData).Assembly);
-
-            var assembly = generator.Generate(x =>
+            var assembly = Generator.Generate(x =>
             {
                 var writer = new SourceWriter(x)
                 .WriteUsingStatements(CreateUsings, Usings)
