@@ -10,10 +10,10 @@ namespace CSVToESLib.Types
 
         public string TypeMappingName { get; }
 
-        public TypeNames(string typeName, string typeMappingName)
+        public TypeNames(string typeName)
         {
             TypeName = typeName;
-            TypeMappingName = typeMappingName;
+            TypeMappingName = $"Csv{TypeName}Mapping";
         }
     }
 }
