@@ -18,7 +18,7 @@ namespace CSVToESLib
     public static class CsvImporterGenerator
     {
         private static int AssemblyNumber = 0;
-        private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Nest", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser", "CSVToESLib" };
+        private static readonly string[] Usings = new string[] { "System.Threading.Tasks", "Nest", "System", "System.Linq", "TinyCsvParser.Mapping", "TinyCsvParser", "CSVToESLib.Interfaces", "CSVToESLib.Types", "System.Collections.Generic" };
         private static readonly Dictionary<string[], ICsvImporter> ImplementationStore = new Dictionary<string[], ICsvImporter>();
         private static readonly AssemblyGenerator Generator = new AssemblyGenerator();
 
