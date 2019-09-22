@@ -48,8 +48,6 @@ namespace CSVToESLib
                 .CreateCsvBulkPriceMapping(fields)
                 .CreateBulkPrice(fields)
                 .CreateElasticsearchClient()
-                .CreateIndex()
-                .CreateInnerIndex()
                 .CreateCsvImporter();
 
                 AssemblyNumber++;
@@ -87,22 +85,6 @@ namespace CSVToESLib
                 .WriteFields(y => y.Write("ElasticClient _elasticClient"))
                 .WriteMethod(CreateElasticsearchClientCtor)
                 .WriteMethod(CreateAsyncBulkInsert)
-                .FinishBlock();
-        }
-
-        private static SourceWriter CreateIndex(this SourceWriter sourceWriter)
-        {
-            return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.Index)))
-                .WriteFields(CreateIndexFields)
-                .WriteMethod(CreateIndexCtor)
-                .FinishBlock();
-        }
-
-        private static SourceWriter CreateInnerIndex(this SourceWriter sourceWriter)
-        {
-            return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.InnerIndex)))
-                .WriteFields(CreateInnerIndexFields)
-                .WriteMethod(CreateInnerIndexCtor)
                 .FinishBlock();
         }
 
@@ -192,32 +174,6 @@ namespace CSVToESLib
         {
             sourceWriter.Write(FirstLine($"async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<{CsvImportClassNames.BulkPrice}>> results, int version)", false));
             sourceWriter.Write("return await ElasticLowLevelClient.BulkAsync<StringResponse>(PostData.MultiJson(results.Where(result => result.IsValid).Select(result => { result.Result.Version = version; return new Object[] { new Index(result.Result) }; }).Aggregate((newValue, oldValue) => oldValue.Concat(newValue).ToArray())));");
-        }
-
-        private static void CreateIndexFields(ISourceWriter sourceWriter)
-        {
-            sourceWriter.Write($"public {CsvImportClassNames.InnerIndex} {CsvImportClassNames.InnerIndex};");
-            sourceWriter.Write($"public {CsvImportClassNames.BulkPrice} {CsvImportClassNames.BulkPrice};");
-        }
-
-        private static void CreateIndexCtor(ISourceWriter sourceWriter)
-        {
-            sourceWriter.Write(FirstLine($"{CsvImportClassNames.Index}({CsvImportClassNames.BulkPrice} {CsvImportClassNames.BulkPrice.ToLower()})", false));
-            sourceWriter.Write($"{CsvImportClassNames.BulkPrice} = {CsvImportClassNames.BulkPrice.ToLower()};");
-            sourceWriter.Write($"{CsvImportClassNames.InnerIndex} = new {CsvImportClassNames.InnerIndex}();");
-        }
-
-        private static void CreateInnerIndexFields(ISourceWriter sourceWriter)
-        {
-            sourceWriter.Write($"public string {CsvImportClassNames._index};");
-            sourceWriter.Write($"public string {CsvImportClassNames._type};");
-        }
-
-        private static void CreateInnerIndexCtor(ISourceWriter sourceWriter)
-        {
-            sourceWriter.Write(FirstLine($"{CsvImportClassNames.InnerIndex}(string index = \"bulkprices\", string type = \"bulkprice\")", false));
-            sourceWriter.Write($"{CsvImportClassNames._index} = index;");
-            sourceWriter.Write($"{CsvImportClassNames._type} = type;");
         }
 
         private static void CreateImportCsv(ISourceWriter sourceWriter)
