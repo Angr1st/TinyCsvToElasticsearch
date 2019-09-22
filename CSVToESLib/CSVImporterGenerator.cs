@@ -82,7 +82,7 @@ namespace CSVToESLib
         private static SourceWriter CreateElasticsearchClient(this SourceWriter sourceWriter)
         {
             return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.ElasticsearchClient)))
-                .WriteFields(y => y.Write("ElasticClient _elasticClient"))
+                .WriteFields(y => y.Write("private ElasticClient _elasticClient;"))
                 .WriteMethod(CreateElasticsearchClientCtor)
                 .WriteMethod(CreateAsyncBulkInsert)
                 .FinishBlock();
