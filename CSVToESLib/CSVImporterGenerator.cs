@@ -145,14 +145,13 @@ namespace CSVToESLib
 
         private static void CreateBulkPriceToStringOverride(ISourceWriter sourceWriter, string[] fields)
         {
-            sourceWriter.Write(FirstLine($"override string ToString()"));
-            var stringBuild = new StringBuilder("return $\"{");
+            sourceWriter.Write(FirstLine($"override string ToString()",false));
+            var stringBuild = new StringBuilder("return $\"{{");
             foreach (var item in fields)
             {
-                stringBuild.Append($"\"{item}\":\"{{{item}}}\",");
+                stringBuild.Append($"\\\"{item}\\\":\\\"{{{item}}}\\\",");
             }
-            stringBuild.Remove(stringBuild.Length - 1, 1);
-            stringBuild.Append("\"};");
+            stringBuild.Append("\\\"Version\\\":\\\"{Version}\\\"}}\";");
             sourceWriter.Write(stringBuild.ToString());
         }
 
