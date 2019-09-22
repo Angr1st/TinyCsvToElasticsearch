@@ -10,18 +10,9 @@ namespace CSVToESLib
     {
         public int RecordCount { get; private set; }
 
-        public BulkAllObserver BulkAllObserver
-        {
-            get => _bulkAllObserver;
-            private set
-            {
-                _bulkAllObserver = value;
-            }
-        }
+        public BulkAllObserver BulkAllObserver { get; private set; } = null;
 
         private readonly TaskCompletionSource<bool> TaskCompletionSource = new TaskCompletionSource<bool>();
-
-        private BulkAllObserver _bulkAllObserver = null;
 
         public ElasticsearchConnection()
         {
