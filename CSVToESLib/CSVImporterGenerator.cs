@@ -12,6 +12,7 @@ using CSVToESLib.Interfaces;
 using SourceWriter = CSVToESLib.Types.SourceWriter;
 using System.Text;
 using Nest;
+using CSVToESLib.Types;
 
 namespace CSVToESLib
 {
@@ -22,7 +23,7 @@ namespace CSVToESLib
         private static readonly Dictionary<string[], ICsvImporter> ImplementationStore = new Dictionary<string[], ICsvImporter>();
         private static readonly AssemblyGenerator Generator = new AssemblyGenerator();
 
-        public static ICsvImporter CreateBulkPriceImporterType(string[] fields)
+        public static ICsvImporter CreateBulkPriceImporterType(string[] fields, TypeNames typeNames) 
         {
             if (ImplementationStore.TryGetValue(fields, out var csvImporter))
             {
@@ -42,9 +43,9 @@ namespace CSVToESLib
                 var writer = new SourceWriter(x)
                 .WriteUsingStatements(CreateUsings, Usings)
                 .WriteNamespace(CreateNamespace, AssemblyNumber)
-                .CreateCsvClient()
-                .CreateCsvBulkPriceMapping(fields)
-                .CreateBulkPrice(fields)
+                .CreateCsvClient(typeNames)
+                .CreateCsvBulkPriceMapping(fields, typeNames)
+                .CreateBulkPrice(fields, typeNames)
                 .CreateElasticsearchClient()
                 .CreateCsvImporter();
 
@@ -62,18 +63,18 @@ namespace CSVToESLib
             return csvImporter1;
         }
 
-        private static SourceWriter CreateCsvClient(this SourceWriter sourceWriter)
+        private static SourceWriter CreateCsvClient(this SourceWriter sourceWriter, TypeNames typeNames)
         {
             return sourceWriter.WriteClass((y) => y.Write(FirstLine(CsvImportClassNames.CsvClient)))
-                .WriteMethod(CreateParse)
+                .WriteMethod(CreateParse, typeNames)
                 .FinishBlock();
         }
 
-        private static SourceWriter CreateBulkPrice(this SourceWriter sourceWriter, string[] fields)
+        private static SourceWriter CreateBulkPrice(this SourceWriter sourceWriter, string[] fields, TypeNames typeNames)
         {
-            return sourceWriter.WriteClass(y => y.Write(FirstLine(CsvImportClassNames.BulkPrice)))
-                .WriteFields(CreateBulkPriceImportPOCOFields, fields)
-                .WriteMethod(CreateBulkPriceToStringOverride, fields)
+            return sourceWriter.WriteClass(y => y.Write(FirstLine(typeNames.TypeName)))
+                .WriteFields(CreatePOCOFields, fields)
+                .WriteMethod(CreateToStringOverride, fields)
                 .FinishBlock();
         }
 
@@ -93,10 +94,10 @@ namespace CSVToESLib
                 .FinishBlock(true); ;
         }
 
-        private static SourceWriter CreateCsvBulkPriceMapping(this SourceWriter sourceWriter, string[] fields)
+        private static SourceWriter CreateCsvBulkPriceMapping(this SourceWriter sourceWriter, string[] fields, TypeNames typeNames)
         {
-            return sourceWriter.WriteClass(y => y.Write(FirstLine($"{CsvImportClassNames.CsvBulkPriceMapping} : {CsvImportClassNames.CsvMapping}<{CsvImportClassNames.BulkPrice}>")))
-                 .WriteMethod(CreatePocoMappingCtor, fields)
+            return sourceWriter.WriteClass(y => y.Write(FirstLine($"{typeNames.TypeMappingName} : {CsvImportClassNames.CsvMapping}<{typeNames.TypeName}>")))
+                 .WriteMethod(CreatePocoMappingCtor, fields, typeNames)
                  .FinishBlock();
         }
 
@@ -123,16 +124,16 @@ namespace CSVToESLib
             sourceWriter.Namespace($"CsvToEsLib{AssemblyNumber}");
         }
 
-        private static void CreateParse(ISourceWriter sourceWriter)
+        private static void CreateParse(ISourceWriter sourceWriter, TypeNames typeNames)
         {
-            sourceWriter.Write(FirstLine($"ParallelQuery<CsvMappingResult<{CsvImportClassNames.BulkPrice}>> Parse(string filePath)", false));
+            sourceWriter.Write(FirstLine($"ParallelQuery<CsvMappingResult<{typeNames.TypeName}>> Parse(string filePath)", false));
             sourceWriter.Write("CsvParserOptions csvParserOptions = new CsvParserOptions(true, ';');");
-            sourceWriter.Write($"{CsvImportClassNames.CsvBulkPriceMapping} csvMapper = new {CsvImportClassNames.CsvBulkPriceMapping}();");
-            sourceWriter.Write($"CsvParser<{CsvImportClassNames.BulkPrice}> csvParser = new CsvParser<{CsvImportClassNames.BulkPrice}>(csvParserOptions, csvMapper);");
+            sourceWriter.Write($"{typeNames.TypeMappingName} csvMapper = new {typeNames.TypeMappingName}();");
+            sourceWriter.Write($"CsvParser<{typeNames.TypeName}> csvParser = new CsvParser<{typeNames.TypeName}>(csvParserOptions, csvMapper);");
             sourceWriter.Write("return csvParser.ReadFromFile(filePath, System.Text.Encoding.UTF8);");
         }
 
-        private static void CreateBulkPriceImportPOCOFields(ISourceWriter sourceWriter, string[] fields)
+        private static void CreatePOCOFields(ISourceWriter sourceWriter, string[] fields)
         {
             foreach (var item in fields)
             {
@@ -141,7 +142,7 @@ namespace CSVToESLib
             sourceWriter.Write($"public int Version;");
         }
 
-        private static void CreateBulkPriceToStringOverride(ISourceWriter sourceWriter, string[] fields)
+        private static void CreateToStringOverride(ISourceWriter sourceWriter, string[] fields)
         {
             sourceWriter.Write(FirstLine($"override string ToString()",false));
             var stringBuild = new StringBuilder("return $\"{{");
@@ -153,9 +154,9 @@ namespace CSVToESLib
             sourceWriter.Write(stringBuild.ToString());
         }
 
-        private static void CreatePocoMappingCtor(ISourceWriter sourceWriter, string[] fields)
+        private static void CreatePocoMappingCtor(ISourceWriter sourceWriter, string[] fields, TypeNames typeNames)
         {
-            sourceWriter.Write(FirstLine($"{CsvImportClassNames.CsvBulkPriceMapping}() : base()", false));
+            sourceWriter.Write(FirstLine($"{typeNames.TypeMappingName}() : base()", false));
             for (int i = 0; i < fields.Length; i++)
             {
                 sourceWriter.Write($"MapProperty({i}, x => x.{fields[i]});");
@@ -185,7 +186,7 @@ namespace CSVToESLib
             sourceWriter.Write($"var {CsvImportClassNames.CsvClient} = new {CsvImportClassNames.CsvClient}();");
             sourceWriter.Write($"var {CsvImportClassNames.ElasticsearchClient} = new {CsvImportClassNames.ElasticsearchClient}(settings);");
             sourceWriter.Write($"var results = {CsvImportClassNames.CsvClient}.Parse(filePath).Where(r => r.IsValid).Select(r => {{ r.Result.Version = version; return r.Result; }}); ");
-            sourceWriter.Write($"var elasticsearchCon = new {nameof(Types.ElasticsearchConnection)}();");
+            sourceWriter.Write($"var elasticsearchCon = new {nameof(ElasticsearchConnection)}();");
             sourceWriter.Write($"return await {CsvImportClassNames.ElasticsearchClient}.BulkInsert(elasticsearchCon, results);");
         }
     }
