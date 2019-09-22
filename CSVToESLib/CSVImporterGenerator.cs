@@ -21,7 +21,7 @@ namespace CSVToESLib
 
         public static ICsvImporter CreateBulkPriceImporterType(string[] fields)
         {
-            if (ImplementationStore.TryGetValue(fields, out ICsvImporter csvImporter))
+            if (ImplementationStore.TryGetValue(fields, out var csvImporter))
             {
                 return csvImporter;
             }
