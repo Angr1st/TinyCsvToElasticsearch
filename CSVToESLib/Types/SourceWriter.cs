@@ -20,6 +20,7 @@ namespace CSVToESLib.Types
         {
             action(Writer, parameter);
             IndentationLevel++;
+
             return this;
         }
 
@@ -60,6 +61,14 @@ namespace CSVToESLib.Types
         }
 
         internal SourceWriter WriteMethod(Action<ISourceWriter> action)
+        {
+            action(Writer);
+            Writer.FinishBlock();
+
+            return this;
+        }
+
+        internal SourceWriter WriteTry(Action<ISourceWriter> action)
         {
             action(Writer);
             Writer.FinishBlock();
