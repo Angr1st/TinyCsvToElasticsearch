@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CSVToESLib
+namespace CSVToESLib.Constants
 {
     public static class CsvImportClassNames
     {

@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Nest;
 using System;
-using CSVToESLib.Template;
+using CSVToESLib.Types;
 
-namespace CSVToESLib
+namespace CSVToESLib.Interfaces
 {
     public interface ICsvImporter
     {

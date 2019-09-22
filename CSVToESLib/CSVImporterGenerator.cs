@@ -6,6 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TinyCsvParser.Mapping;
+using CSVToESLib.Extensions;
+using CSVToESLib.Constants;
+using CSVToESLib.Interfaces;
+using SourceWriter = CSVToESLib.Types.SourceWriter;
 
 namespace CSVToESLib
 {

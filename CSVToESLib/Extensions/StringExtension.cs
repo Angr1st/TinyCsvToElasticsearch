@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace CSVToESLib
+namespace CSVToESLib.Extensions
 {
     internal static class StringExtension
     {

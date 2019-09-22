@@ -1,10 +1,7 @@
 ﻿using LamarCodeGeneration;
-using LamarCompiler;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace CSVToESLib
+namespace CSVToESLib.Types
 {
     internal class SourceWriter
     {

@@ -1,12 +1,8 @@
-﻿using Elasticsearch.Net;
+﻿using CSVToESLib.Types;
+using Nest;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Nest;
-using TinyCsvParser.Mapping;
 
 namespace CSVToESLib.Template
 {

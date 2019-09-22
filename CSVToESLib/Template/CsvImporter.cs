@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CSVToESLib.Interfaces;
+using CSVToESLib.Types;
 using Nest;
 
 namespace CSVToESLib.Template

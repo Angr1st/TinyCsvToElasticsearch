@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSVToESLib
+namespace CSVToESLib.Types
 {
     public class ElasticsearchConnection
     {
