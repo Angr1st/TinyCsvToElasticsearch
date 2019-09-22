@@ -172,8 +172,14 @@ namespace CSVToESLib
 
         private static void CreateAsyncBulkInsert(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write(FirstLine($"async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<{CsvImportClassNames.BulkPrice}>> results, int version)", false));
-            sourceWriter.Write("return await ElasticLowLevelClient.BulkAsync<StringResponse>(PostData.MultiJson(results.Where(result => result.IsValid).Select(result => { result.Result.Version = version; return new Object[] { new Index(result.Result) }; }).Aggregate((newValue, oldValue) => oldValue.Concat(newValue).ToArray())));");
+            sourceWriter.Write(FirstLine($"async Task<<Result<int, Exception>> BulkInsert<T>(ElasticsearchConnection con, IEnumerable<T> results) where T : class", false));
+            sourceWriter.Write("try {");
+            sourceWriter.Write("var bulkAllObservable = _elasticClient.BulkAll(results, b => b.Index(IndexName.From<T>()).Type(TypeName.From<T>()).RefreshOnCompleted().MaxDegreeOfParallelism(Environment.ProcessorCount).Size(5000));");
+            sourceWriter.Write("bulkAllObservable.Subscribe(con.BulkAllObserver);");
+            sourceWriter.Write("await con.WaitForCompletion();");
+            sourceWriter.Write("return new Result<int, Exception>(con.RecordCount);");
+            sourceWriter.Write("} catch (Exception e) {");
+            sourceWriter.Write("return new Result<int, Exception>(e); }");
         }
 
         private static void CreateImportCsv(ISourceWriter sourceWriter)
