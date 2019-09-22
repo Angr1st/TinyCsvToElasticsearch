@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2037
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCSVToES", "TinyCSVToES\TinyCSVToES.csproj", "{6077685C-8EC1-4D78-BC98-860E4E33BC37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyCSVToES", "TinyCSVToES\TinyCSVToES.csproj", "{6077685C-8EC1-4D78-BC98-860E4E33BC37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSVToESLib", "CSVToESLib\CSVToESLib.csproj", "{2A05A3E8-612D-4CDD-8F0D-6DD7CBCB3FA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSVToESLib", "CSVToESLib\CSVToESLib.csproj", "{2A05A3E8-612D-4CDD-8F0D-6DD7CBCB3FA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSVToESLib.Tests", "CSVToESLib.Tests\CSVToESLib.Tests.csproj", "{FC3E7F47-64CE-4293-89D5-D3BB7C4BD72B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSVToESLib.Tests", "CSVToESLib.Tests\CSVToESLib.Tests.csproj", "{FC3E7F47-64CE-4293-89D5-D3BB7C4BD72B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5943D4F7-3FD5-4C88-8F1B-41C4012AE904}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
