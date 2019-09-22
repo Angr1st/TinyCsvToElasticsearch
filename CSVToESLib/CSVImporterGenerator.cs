@@ -172,7 +172,7 @@ namespace CSVToESLib
 
         private static void CreateAsyncBulkInsert(ISourceWriter sourceWriter)
         {
-            sourceWriter.Write(FirstLine($"async Task<<Result<int, Exception>> BulkInsert<T>(ElasticsearchConnection con, IEnumerable<T> results) where T : class", false));
+            sourceWriter.Write(FirstLine($"async Task<Result<int, Exception>> BulkInsert<T>(ElasticsearchConnection con, IEnumerable<T> results) where T : class", false));
             sourceWriter.Write("try {");
             sourceWriter.Write("var bulkAllObservable = _elasticClient.BulkAll(results, b => b.Index(IndexName.From<T>()).Type(TypeName.From<T>()).RefreshOnCompleted().MaxDegreeOfParallelism(Environment.ProcessorCount).Size(5000));");
             sourceWriter.Write("bulkAllObservable.Subscribe(con.BulkAllObserver);");
