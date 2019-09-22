@@ -15,3 +15,6 @@ variables:
 steps:
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+- script: dotnet test --configuration $(buildConfiguration) --no-build
+  displayName: 'dotnet test $(buildConfiguration)'
+- script: dotnet pack --configuration $(buildConfiguration) --no-build CSVToESLib
