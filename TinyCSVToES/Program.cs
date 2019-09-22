@@ -1,5 +1,6 @@
 ﻿using CSVToESLib;
 using CSVToESLib.Template;
+using CSVToESLib.Types;
 using Nest;
 using System.IO;
 using System.Linq;
@@ -23,11 +24,12 @@ namespace TinyCSVToES
             //File.WriteAllText("test1.json", innerIndex.ToString(), System.Text.Encoding.UTF8);
             //File.WriteAllText("test.json", person.ToString(), System.Text.Encoding.UTF8);
             //File.WriteAllText("test3.json", index.ToString(), System.Text.Encoding.UTF8);
+            var typeNames = new TypeNames("Person");
             var filePath2 = "testData3.csv";
-            var csvImporter = CsvImporterGenerator.CreateBulkPriceImporterType(GetHeaders(filePath2));
+            var csvImporter = CsvImporterGenerator.CreateBulkPriceImporterType(GetHeaders(filePath2), typeNames);
             var settings = new ConnectionSettings().DefaultIndex("persons");
             var result = await csvImporter.ImportCsv(settings, filePath2, 1);
-            
+
             ReadLine();
         }
 
