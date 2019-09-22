@@ -12,7 +12,8 @@
 - [x] Create some kind of store for the different created types
 - [x] Create tests
 - [x] Create License.md
-- [ ] Update the code gen logic
+- [x] Update the code gen logic
+- [ ] Fix Bug relating to bulkInserting
 - [ ] Set up CI
 - [ ] Set up CD
 - [ ] Publish Nuget Package
