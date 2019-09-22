@@ -18,7 +18,7 @@ namespace CSVToESLib.Template
                 r.Result.Version = version;
                 return r.Result;
             });
-            var elasticsearchCon = new ElasticsearchConnection();
+            var elasticsearchCon = new ElasticsearchConnection(5000);
             return await elasticsearchClient.BulkInsert(elasticsearchCon, results);
         }
     }
