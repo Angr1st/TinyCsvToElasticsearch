@@ -13,6 +13,8 @@ variables:
  - group: 'DotnetCoreVersion'
  - name: 'buildConfiguration'
    value: 'Release'
+ - name: 'version'
+   value: '0.0.1'
 
 steps:
 - task: UseDotNet@2
@@ -29,7 +31,8 @@ steps:
     packagesToPack: '**/CSVToESLib.csproj'
     nobuild: true
     includesymbols: true
-    versioningScheme: 'byBuildNumber'
+    versioningScheme: byEnvVar
+    versionEnvVar: version
 - task: DotNetCoreCLI@2
   inputs:
     command: 'push'
