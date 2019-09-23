@@ -10,11 +10,28 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  buildConfiguration: 'Release'
+ - groups: 'DotnetCoreVersion'
+ - buildConfiguration: 'Release'
 
 steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '$(netCoreVersion)'
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
 - script: dotnet test --configuration $(buildConfiguration) --no-build
   displayName: 'dotnet test $(buildConfiguration)'
-- script: dotnet pack --configuration $(buildConfiguration) --no-build CSVToESLib
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/CSVToESLib.csproj'
+    nobuild: true
+    includesymbols: true
+    versioningScheme: 'byBuildNumber'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+    nuGetFeedType: 'external'
+    publishFeedCredentials: 'Angrist Nuget'
