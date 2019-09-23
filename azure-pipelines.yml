@@ -11,7 +11,8 @@ pool:
 
 variables:
  - group: 'DotnetCoreVersion'
- - buildConfiguration: 'Release'
+ - name: 'buildConfiguration'
+   value: 'Release'
 
 steps:
 - task: UseDotNet@2
