@@ -17,6 +17,9 @@ variables:
    value: '0.1.1'
 
 steps:
+- task: NuGetToolInstaller@1
+  inputs:
+    versionSpec: '5.2.0'
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
@@ -33,9 +36,9 @@ steps:
     includesymbols: true
     versioningScheme: byEnvVar
     versionEnvVar: version
-- task: DotNetCoreCLI@2
+- task: NuGetCommand@2
   inputs:
     command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
     nuGetFeedType: 'external'
     publishFeedCredentials: 'Angrist Nuget'
