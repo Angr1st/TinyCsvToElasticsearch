@@ -13,7 +13,7 @@
 - [x] Create tests
 - [x] Create License.md
 - [x] Update the code gen logic
-- [ ] Fix Bug relating to bulkInserting
-- [ ] Set up CI
-- [ ] Set up CD
-- [ ] Publish Nuget Package
+- [x] Fix Bug relating to bulkInserting
+- [x] Set up CI
+- [x] Set up CD
+- [x] Publish Nuget Package
