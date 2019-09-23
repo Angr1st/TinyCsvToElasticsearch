@@ -8,9 +8,9 @@ namespace CSVToESLib.Template
     {
         public ParallelQuery<CsvMappingResult<Person>> Parse(string filePath)
         {
-            CsvParserOptions csvParserOptions = new CsvParserOptions(true, ';');
-            CSVPersonMapping csvMapper = new CSVPersonMapping();
-            CsvParser<Person> csvParser = new CsvParser<Person>(csvParserOptions, csvMapper);
+            var csvParserOptions = new CsvParserOptions(true, ';');
+            var csvMapper = new CSVPersonMapping();
+            var csvParser = new CsvParser<Person>(csvParserOptions, csvMapper);
 
             return csvParser.ReadFromFile(filePath, System.Text.Encoding.UTF8);
         }
@@ -26,14 +26,19 @@ namespace CSVToESLib.Template
         }
     }
 
-    class Person
+    public class Person
     {
-        public string FirstName;
+        public string FirstName { get; set; }
 
-        public string LastName;
+        public string LastName { get; set; }
 
-        public string BirthDay;
+        public string BirthDay { get; set; }
 
         public int Version;
+
+        public override string ToString()
+        {
+            return $"{{\"FirstName\":\"{FirstName}\",\"LastName\":\"{LastName}\",\"BirthDay\":\"{BirthDay}\",\"Version\":\"{Version}\"}}";
+        }
     }
 }

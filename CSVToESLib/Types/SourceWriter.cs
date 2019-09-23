@@ -1,9 +1,7 @@
-﻿using LamarCompiler;
+﻿using LamarCodeGeneration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace CSVToESLib
+namespace CSVToESLib.Types
 {
     internal class SourceWriter
     {
@@ -22,6 +20,7 @@ namespace CSVToESLib
         {
             action(Writer, parameter);
             IndentationLevel++;
+
             return this;
         }
 
@@ -61,7 +60,27 @@ namespace CSVToESLib
             return this;
         }
 
-        internal SourceWriter WriteMethod(Action<ISourceWriter> action)
+        internal SourceWriter WriteMethod<T, U>(Action<ISourceWriter, T, U> action, T parameter, U parameter2)
+        {
+            action(Writer, parameter, parameter2);
+            Writer.FinishBlock();
+
+            return this;
+        }
+
+        internal SourceWriter WriteMethod(Action<ISourceWriter> action, bool expressionBody = false)
+        {
+            action(Writer);
+            if (!expressionBody)
+            {
+                Writer.FinishBlock();
+            }
+
+
+            return this;
+        }
+
+        internal SourceWriter WriteTry(Action<ISourceWriter> action)
         {
             action(Writer);
             Writer.FinishBlock();

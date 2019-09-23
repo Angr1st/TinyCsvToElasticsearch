@@ -1,46 +1,37 @@
-﻿using Elasticsearch.Net;
+﻿using CSVToESLib.Types;
+using Nest;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using TinyCsvParser.Mapping;
 
 namespace CSVToESLib.Template
 {
     internal class ElasticsearchClient
     {
-        ElasticLowLevelClient ElasticLowLevelClient { get; set; }
-        public ElasticsearchClient(ConnectionConfiguration configuration)
+        private readonly ElasticClient _elasticClient;
+
+        public ElasticsearchClient(IConnectionSettingsValues settings) => _elasticClient = new ElasticClient(settings);
+
+        public async Task<Result<int, Exception>> BulkInsert<T>(ElasticsearchConnection con, IEnumerable<T> results) where T : class
         {
-            ElasticLowLevelClient = new ElasticLowLevelClient(configuration);
-        }
+            try
+            {
+                var bulkAllObservable = _elasticClient.BulkAll(results, b => b
+                    .Index(IndexName.From<T>())
+                    .Type(TypeName.From<T>())
+                    .RefreshOnCompleted()
+                    .MaxDegreeOfParallelism(Environment.ProcessorCount)
+                    .Size(5000)
+                );
+                bulkAllObservable.Subscribe(con.BulkAllObserver);
+                await con.WaitForCompletion();
 
-        public async Task<StringResponse> BulkInsert(ParallelQuery<CsvMappingResult<Person>> results, int version)
-        {
-            return await ElasticLowLevelClient.BulkAsync<StringResponse>(PostData.MultiJson(results.Where(result => result.IsValid).Select(result =>{ result.Result.Version = version; return new Object[] { new Index(result.Result) }; }).Aggregate((newValue, oldValue) => oldValue.Concat(newValue).ToArray())));
-        }
-    }
-
-    internal class Index
-    {
-        public InnerIndex InnerIndex;
-        public Person Person;
-
-        public Index(Person person)
-        {
-            Person = person;
-            InnerIndex = new InnerIndex();
-        }
-    }
-
-    internal class InnerIndex
-    {
-        public string _index;
-        public string _type;
-
-        public InnerIndex(string index = "persons", string type = "person")
-        {
-            _index = index;
-            _type = type;
+                return new Result<int, Exception>(con.RecordCount);
+            }
+            catch (Exception e)
+            {
+                return new Result<int, Exception>(e);
+            }
         }
     }
 }
