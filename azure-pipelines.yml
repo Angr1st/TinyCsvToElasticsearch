@@ -10,7 +10,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
- - groups: 'DotnetCoreVersion'
+ - group: 'DotnetCoreVersion'
  - buildConfiguration: 'Release'
 
 steps:
